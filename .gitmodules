@@ -1,0 +1,3 @@
+[submodule "bitset2"]
+	path = bitset2
+	url = git@github.com:ClaasBontus/bitset2.git
