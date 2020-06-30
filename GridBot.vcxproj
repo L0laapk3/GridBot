@@ -75,12 +75,14 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
+    <IntDir>build\$(Platform)\$(Configuration)</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
+    <IntDir>build\$(Platform)\$(Configuration)</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -106,6 +108,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
+      <AdditionalIncludeDirectories>inc;.</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -144,6 +147,7 @@
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <AdditionalOptions>/favor:INTEL64 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalIncludeDirectories>inc;.</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -153,19 +157,19 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Board.cpp" />
-    <ClCompile Include="BoardEval.cpp" />
-    <ClCompile Include="BoardHeuristic.cpp" />
-    <ClCompile Include="boardExplore.cpp" />
-    <ClCompile Include="GridBot.cpp" />
-    <ClCompile Include="Conn.cpp" />
-    <ClCompile Include="MovesTree.cpp" />
+    <ClCompile Include="src\Board.cpp" />
+    <ClCompile Include="src\BoardEval.cpp" />
+    <ClCompile Include="src\BoardHeuristic.cpp" />
+    <ClCompile Include="src\boardExplore.cpp" />
+    <ClCompile Include="src\GridBot.cpp" />
+    <ClCompile Include="src\Conn.cpp" />
+    <ClCompile Include="src\MovesTree.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="bitset2\bitset2.hpp" />
-    <ClInclude Include="Board.h" />
-    <ClInclude Include="Conn.h" />
-    <ClInclude Include="MovesTree.h" />
+    <ClInclude Include="inc\Board.h" />
+    <ClInclude Include="inc\Conn.h" />
+    <ClInclude Include="inc\MovesTree.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

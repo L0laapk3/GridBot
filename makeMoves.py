@@ -108,7 +108,7 @@ def buildTree(elOrig, intend = 0):
 	else:
 		return "new Node{}"
 
-with open('MovesTree.cpp', "w") as f:
+with open('src/MovesTree.cpp', "w") as f:
 	f.write("#include \"MovesTree.h\"\n\n")
 	f.write("const Node ALLMOVES" + buildTree(tree) + ";\n")
 

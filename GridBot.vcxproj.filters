@@ -15,39 +15,39 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="GridBot.cpp">
+    <ClCompile Include="src\MovesTree.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Conn.cpp">
+    <ClCompile Include="src\GridBot.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Board.cpp">
+    <ClCompile Include="src\Conn.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="BoardEval.cpp">
+    <ClCompile Include="src\BoardHeuristic.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="BoardHeuristic.cpp">
+    <ClCompile Include="src\boardExplore.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="boardExplore.cpp">
+    <ClCompile Include="src\BoardEval.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MovesTree.cpp">
+    <ClCompile Include="src\Board.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Conn.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Board.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="bitset2\bitset2.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MovesTree.h">
+    <ClInclude Include="inc\MovesTree.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\Conn.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\Board.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
