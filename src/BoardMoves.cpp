@@ -64,7 +64,7 @@ void Board::iterateMoves(MoveFunc cb) const {
 
 
 	constexpr auto randomGrid = repeat(0x0f);
-	Data randomMask = compareToMask(data, randomGrid);
+	Data randomMask = maskedCompareToMask(data, randomGrid);
 
 	std::function<void(std::array<Data, MAXRAND+1>&, Node const*, const int&, const int&, const Move&, const int&)> exploreCombinations =
 		[&](std::array<Data, MAXRAND+1>& prevDatas, Node const* moves, const int& length, const int& end, const Move& cells, const int& cellShift) {
@@ -85,9 +85,9 @@ void Board::iterateMoves(MoveFunc cb) const {
 					const Data shifted = direction < 0 ? prevDatas[i] >> (-5 * direction) : prevDatas[i] << (5 * direction);
 					const Data shiftedNoRandom = shifted & ~randomMask | prevToNextRandLevel;
 					prevToNextRandLevel = shifted | randomMask;
-					datas[i] = shiftedNoRandom & compareToMask(shiftedNoRandom, data, mask);
+					datas[i] = shiftedNoRandom & maskedCompareToMask(shiftedNoRandom, data, mask);
 				} else
-					datas[i] = repeat(0x0f) & compareToMask(prevToNextRandLevel, data, mask);
+					datas[i] = repeat(0x0f) & maskedCompareToMask(prevToNextRandLevel, data, mask);
 
 				if (datas[i].any()) {
 					if (newMoves->end) {

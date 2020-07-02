@@ -1,28 +1,27 @@
 #pragma once
 
-#include "board.h"
 #include <vector>
 
-
-class ExploreNode;
-struct ExploredNodeInfo {
-	uint64_t wildcardInfo;
-	std::vector<ExploreNode>* childNodes;
-};
-struct CollapsedNodeInfo {
-	uint64_t wildcardInfo;
-	uint64_t score;
-};
+#include "board.h"
 
 class ExploreNode {
 	public:
-		ExploreNode(const Data& data);
+		ExploreNode(const ExploreNode& exploreNode);
+		ExploreNode(const Board& board, const uint64_t& score);
 
-		std::vector<ExploreNode>* Explore();
-		uint64_t getScore();
+		std::vector<ExploreNode>& Explore(const uint64_t& prevScore);
+		void computeScore();
 
 		~ExploreNode();
 
 	private:
-		Data data;
+		union data {
+			Board board;
+			struct {
+				uint64_t wildcardInfo;	// wildcard locations
+				std::vector<ExploreNode> childNodes;
+			} deep;
+			~data() {};
+		} info;
+		uint64_t score; // upper 32 bits score, lower 32 bits consumed wildcards
 };

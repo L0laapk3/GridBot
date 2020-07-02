@@ -92,7 +92,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -160,13 +160,14 @@
     <ClCompile Include="src\ExploreNode.cpp" />
     <ClCompile Include="src\Board.cpp" />
     <ClCompile Include="src\BoardEval.cpp" />
-    <ClCompile Include="src\BoardHeuristic.cpp" />
-    <ClCompile Include="src\boardExplore.cpp" />
+    <ClCompile Include="src\BoardSearch.cpp" />
+    <ClCompile Include="src\BoardMoves.cpp" />
     <ClCompile Include="src\GridBot.cpp" />
     <ClCompile Include="src\Conn.cpp" />
     <ClCompile Include="src\MovesTree.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="inc\BoardUtil.h" />
     <ClInclude Include="lib\bitset2\bitset2.hpp" />
     <ClInclude Include="inc\ExploreNode.h" />
     <ClInclude Include="inc\Board.h" />

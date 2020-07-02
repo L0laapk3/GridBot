@@ -5,20 +5,19 @@
 
 
 // basic eval that counts how many connections each cell has
-uint32_t Board::eval() const {
-	uint32_t score = 0;
+const float& Board::eval() const {
+	float score = 0;
 
 	constexpr Data randomMask = repeat(0b01111);
-	Data randoms = compareCells(data, randomMask);
+	Data randoms = andBits(data == randomMask);
 
-	Data d123Check = ~(((data | data >> 1) & data >> 4) | (data & data >> 1) | data >> 2 | data >> 3);
-	Data d123 = d123Check & d123Check >> 1 & d123Check >> 2 & d123Check >> 3 & d123Check >> 4;
+	Data d123 = andBits(~(((data | data >> 1)& data >> 4) | (data & data >> 1) | data >> 2 | data >> 3));
 
-	Data left = compareCells(data >> 5, data);
+	Data left = andBits(data == data >> 5);
 	constexpr Data leftMask = repeat(0b00001, 1, 0);
 	score += 3 * (left & ~randoms & leftMask).count();
 
-	Data up = compareCells(data >> 5*5, data);
+	Data up = andBits(data == data >> 5*5);
 	constexpr Data upMask = repeat(0b00001, 0, 1);
 	score += 3 * (up & ~randoms & upMask).count();
 

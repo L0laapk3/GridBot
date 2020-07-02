@@ -6,10 +6,6 @@
 
 
 
-Board::Board() {
-}
-
-
 
 
 // every cell is 5 bits: mnnnn
@@ -19,6 +15,11 @@ Board::Board() {
 // m=0 and n=1111 -> random
 
 
+
+
+Board::Board() : data(0) { }
+
+Board::~Board() { }
 
 
 Board::Board(const Data& data) {
@@ -59,23 +60,6 @@ void Board::print() const {
 		}
 		std::cout << std::endl;	
 	}
-}
-
-
-void printRaw(const Data& data) {
-	unsigned long i = 0;
-	for (int j = 0; j < 5; j++) {
-		for (int k = 0; k < 5; k++) {
-			for (int m = 0; m < 5; m++) {
-				std::cout << ((data >> i) & Data(0b1)).to_ulong();
-				i++;
-			}
-			if (k < 4)
-				std::cout << " ";
-		}
-		std::cout << std::endl;
-	}
-	std::cout << std::endl;
 }
 
 
