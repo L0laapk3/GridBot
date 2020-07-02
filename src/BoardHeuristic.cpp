@@ -6,7 +6,7 @@
 #include <cassert>
 
 constexpr size_t TRIM_SIZE = 256;
-constexpr auto TIME_PER_MOVE = std::chrono::milliseconds(1000);
+constexpr auto TIME_PER_MOVE = std::chrono::milliseconds(000);
 
 struct Candidate {
 	uint64_t score;
@@ -24,7 +24,7 @@ uint32_t Board::findBestMove() const {
 			candidates.begin(),
 			candidates.begin() + std::min(TRIM_SIZE, candidates.size()),
 			candidates.end(),
-			[](const Candidate& a, const Candidate& b) { return a.score < b.score; }
+			[](const Candidate& a, const Candidate& b) { return a.score > b.score; }
 		);
 		if (candidates.size() > TRIM_SIZE)
 			candidates.resize(TRIM_SIZE);

@@ -157,6 +157,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\ExploreNode.cpp" />
     <ClCompile Include="src\Board.cpp" />
     <ClCompile Include="src\BoardEval.cpp" />
     <ClCompile Include="src\BoardHeuristic.cpp" />
@@ -166,7 +167,8 @@
     <ClCompile Include="src\MovesTree.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="bitset2\bitset2.hpp" />
+    <ClInclude Include="lib\bitset2\bitset2.hpp" />
+    <ClInclude Include="inc\ExploreNode.h" />
     <ClInclude Include="inc\Board.h" />
     <ClInclude Include="inc\Conn.h" />
     <ClInclude Include="inc\MovesTree.h" />
