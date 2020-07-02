@@ -1,41 +1,40 @@
 
-#include "exploreNode.h"
 
+#include "exploreNode.h"
 #include <cassert>
 
-ExploreNode::ExploreNode(const Board& board, const uint64_t& score) : info{ board }, score(score) {
+ExploreNode::ExploreNode(const Board& board, const uint64_t& score) : score(score) {
+	info.board = board;
 	assert(info.board.data[127] == 0 && info.board.data[126] == 0 && info.board.data[125] == 0);
 }
 
-ExploreNode::ExploreNode(const ExploreNode& exploreNode) : score(exploreNode.score) {
-	if (info.board.data[127])
-		info.deep = exploreNode.info.deep;
-	else
-		info.board = exploreNode.info.board;
-}
 
-std::vector<ExploreNode>& ExploreNode::Explore(const uint64_t& prevScore) {
+void ExploreNode::Explore() {
 	// will use the consumed wildcards in the lower 32 bits of prevScore
 #ifndef NDEBUG
 	assert(info.board.data[127] == 0 && info.board.data[126] == 0 && info.board.data[125] == 0);
 #endif
 
-	bool first = false;
+	bool first = true;
+	const uint64_t availableWildcards = shrink(andBits(info.board.data == repeat(0x0f)));
+	std::vector<ExploreNode> childNodes;
 	MoveFunc foundMove = [&](const Board& board, const unsigned long& consumedWildcards) {
-		if (!first) {
-			first = true;
-			// at this point, we switch union to deep
-			info.deep = { shrink(andBits(info.board.data == repeat(0x0f))) << 32 | (prevScore & 0xffffffff) | 1 << 63, { } };
-		}
 		const float& score = board.eval();
-		info.deep.childNodes.push_back(ExploreNode(board, (reinterpret_cast<const uint32_t&>(score) << 32) | consumedWildcards));
+		childNodes.push_back(ExploreNode(board, ((uint64_t)reinterpret_cast<const uint32_t&>(score) << 32) | consumedWildcards));
 	};
 	info.board.iterateMoves(foundMove);
 
-	info.deep.childNodes.shrink_to_fit();
+	childNodes.shrink_to_fit();
 
-	return info.deep.childNodes;
+	info.childNodes = {
+		childNodes.data(),
+		availableWildcards << 32 | childNodes.size()
+	};
+
+	// shitty hack to steal ownership of the now array on the heap.
+	new (&childNodes) std::vector<ExploreNode>; 
 }
+
 
 void ExploreNode::computeScore() {
 #ifndef NDEBUG
@@ -47,16 +46,17 @@ void ExploreNode::computeScore() {
 		return;
 
 	// calculate score based on children, resolve dependencies in used wildcards and shit
-	for (ExploreNode& node : info.deep.childNodes)
-		node.computeScore();
+	const auto& end = info.childNodes.begin + (info.childNodes.wildcards_size & 0xffffffff);
+	for (auto i = info.childNodes.begin; i < end; i++)
+		(*i).computeScore();
 
-	std::array<unsigned long, 3> wildcards{ info.deep.wildcardInfo >> 32 };
+	std::array<unsigned long, 3> wildcards{ info.childNodes.wildcards_size >> 32 };
 	float partialScore = 0;
 	float remainderChance = 1;
-	for (auto i = info.deep.childNodes.begin(); i < info.deep.childNodes.end(); i++) {
-		std::partial_sort(i, i + 1, info.deep.childNodes.end(), [](const ExploreNode& a, const ExploreNode& b) { return a.score > b.score; });
+	for (auto i = info.childNodes.begin; i < end; i++) {
+		std::partial_sort(i, i + 1, end, [](const ExploreNode& a, const ExploreNode& b) { return a.score > b.score; });
 		const ExploreNode& node = *i;
-		unsigned long consumedWildcards = node.score;
+		unsigned long consumedWildcards = (unsigned long)node.score;
 		const unsigned short wildcardValue = (node.score >> 25) & 0x3;
 		if (consumedWildcards & ~wildcards[wildcardValue])
 			continue;	// move uses wildcard value that isn't available anymore (has 0% chance of occuring)
@@ -82,13 +82,13 @@ void ExploreNode::computeScore() {
 		break;
 		cnt:;
 	}
-	score = (reinterpret_cast<uint32_t&>(partialScore) << 32) | (score & 0xffffffff);
-
-	info.deep.childNodes.~vector();
-	return;
+	score = ((uint64_t)reinterpret_cast<uint32_t&>(partialScore) << 32) | (score & 0xffffffff);
 }
 
+
 ExploreNode::~ExploreNode() {
+	// 127: vector was created
+	// 126: vector was destructed again
 	assert((info.board.data[127] == 0 && info.board.data[126] == 0 && info.board.data[125] == 0)
 		|| (info.board.data[127] == 1 && info.board.data[126] == 1 && info.board.data[125] == 0));
 }

@@ -8,3 +8,5 @@ struct Node {
     Node const* right = nullptr;
     const bool end = true;
 };
+
+extern const Node ALLMOVES;

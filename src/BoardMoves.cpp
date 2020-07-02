@@ -7,9 +7,6 @@
 #include <initializer_list>
 
 
-#include "MovesTree.cpp"
-
-
 
 // only care about moves that contain MAXRAND or less wildcard cells.
 constexpr int MAXRAND = 0;

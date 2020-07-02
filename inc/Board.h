@@ -8,20 +8,16 @@
 #include <vector>
 
 
-
 typedef Bitset2::bitset2<128> Data;
 typedef uint32_t Move;
-typedef float Score;
+
+#include "BoardUtil.h"
 
 class Board;
 typedef std::function<void(const Board&, const Move&)> MoveFunc;
 
 
-#include "BoardUtil.h"
 
-
-
-void printRaw(const Data& data);
 
 class Board {
 public:
