@@ -35,7 +35,7 @@ public:
 
 	std::vector<int> decompressMove(const Move& move) const;
 
-	const float& eval() const;
+	const float eval() const;
 
 
 	Data data = Data(0);

@@ -9,7 +9,7 @@
 
 
 // only care about moves that contain MAXRAND or less wildcard cells.
-constexpr int MAXRAND = 10;
+constexpr int MAXRAND = 8;
 
 
 void Board::iterateMoves(MoveFunc cb) const {

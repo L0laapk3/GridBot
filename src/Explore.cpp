@@ -8,11 +8,11 @@
 #include <cassert>
 
 
-constexpr size_t TRIM_SIZE = 256;
+constexpr size_t TRIM_SIZE = 1024;
 constexpr auto TIME_PER_ACTION = std::chrono::milliseconds(1000);
 
 
-uint64_t findBestMove(const Board& board) {
+unsigned long findBestMove(const Board& board) {
 	
 	// possibly better to save score locally instead of pointer to it
 	std::vector<Candidate> candidates{};
@@ -74,6 +74,7 @@ uint64_t findBestMove(const Board& board) {
 			assert(best != candidate.node);
 		uint64_t startSize = candidates.size();
 		best->explore(candidates);
+
 		for (const auto& candidate : candidates)
 			assert(candidate.node->info.board.data[127] == 0);
 		cycles += candidates.size() - startSize;
@@ -92,7 +93,14 @@ uint64_t findBestMove(const Board& board) {
 	for (auto& node : topLevelMoves)
 		node.computeScore();
 
-	const auto& bestCandidate = std::max_element(topLevelMoves.begin(), topLevelMoves.end(), [](const ExploreNode& a, const ExploreNode& b) { return a.score > b.score; });
+	const auto& bestCandidate = std::max_element(topLevelMoves.begin(), topLevelMoves.end(), [](const ExploreNode& a, const ExploreNode& b) { return a.score < b.score; });
+
+	//for (auto& node : topLevelMoves) {
+	//	uint64_t s = node.score >> 32;
+	//	std::cout << "score " << *(float*)&(s) << std::endl;
+	//}
+	uint64_t s = bestCandidate->score >> 32;
+	std::cout << "bestScore " << *(float*)&(s) << std::endl;
 
 	return bestCandidate->score & 0xffffffff;
 }

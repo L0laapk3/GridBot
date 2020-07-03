@@ -104,10 +104,10 @@ void Board::set(const std::string& str) {
 
 
 std::vector<int> Board::decompressMove(const Move& move) const {
-	print();
+	//print();
 	int pos = (move >> 25) & 0x1f;
 	const Bitset2::bitset2<25> bitboard(move & 0x1ffffff);
-	std::cout << bitboard << std::endl;
+	//std::cout << bitboard << std::endl;
 	int length = bitboard.count();
 	const Data value = (data >> (5 * pos)) & Data(0x1f);
 
@@ -116,7 +116,6 @@ std::vector<int> Board::decompressMove(const Move& move) const {
 	std::function<bool()> tryDirections = [&]() {
 		for (const int direction : std::array<int, 4>{ -5, -1, 1, 5 }) {
 			const int newPos = pos + direction;
-			std::cout << newPos << " " << pos << std::endl;
 			if (newPos < 0 || newPos >= 25 || (std::abs(direction) == 1 && pos / 5 != newPos / 5) || std::find(v.begin(), v.end(), newPos) != v.end())
 				continue;
 			if (bitboard[newPos] == 0)

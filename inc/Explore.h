@@ -4,4 +4,4 @@
 #include "Board.h"
 
 
-uint64_t findBestMove(const Board& board);
+unsigned long findBestMove(const Board& board);

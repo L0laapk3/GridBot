@@ -8,7 +8,9 @@
 
 ExploreNode::ExploreNode(const Board& board, const unsigned long& move) {
 	info.board = board;
-	score = *(uint64_t*)&board.eval() << 32 | move;
+	const float scoreFloat = board.eval();
+	//std::cout << "hello! " << scoreFloat << std::endl;
+	score = *(uint64_t*)&scoreFloat << 32 | move;
 	assert(info.board.data[127] == 0 && info.board.data[126] == 0 && info.board.data[125] == 0);
 }
 
@@ -66,22 +68,24 @@ void ExploreNode::computeScore() {
 
 	// calculate score based on children, resolve dependencies in used wildcards and shit
 	const auto& end = info.childNodes.begin + (info.childNodes.wildcards_size & 0xffffffff);
-	for (auto i = info.childNodes.begin; i < end; i++)
-		(*i).computeScore();
+	for (auto* it = info.childNodes.begin; it < end; it++)
+		(*it).computeScore();
 
 	std::array<unsigned long, 3> wildcards{ info.childNodes.wildcards_size >> 32 };
-	float partialScore = 0;
-	float remainderChance = 1;
-	for (auto i = info.childNodes.begin; i < end; i++) {
-		std::partial_sort(i, i + 1, end, [](const ExploreNode& a, const ExploreNode& b) { return a.score > b.score; });
-		const ExploreNode& node = *i;
+	float partialScore = 0.f;
+	float remainderChance = 1.f;
+	for (auto it = info.childNodes.begin; it < end; it++) {
+		std::partial_sort(it, it + 1, end, [](const ExploreNode& a, const ExploreNode& b) { return a.score > b.score; });
+		const ExploreNode& node = *it;
 		unsigned long consumedWildcards = (unsigned long)node.score;
 		const unsigned short wildcardValue = (node.score >> 30) & 0x3;	// 00 = 2, 01 = 1, 10 = 3
-		if (consumedWildcards & ~wildcards[wildcardValue])
-			continue;	// move uses wildcard value that isn't available anymore (has 0% chance of occuring)
-
 		uint32_t scoreInt = node.score >> 32;
-		float& score = *(float*)(&scoreInt);
+		node.~ExploreNode();
+		if (consumedWildcards & ~wildcards[wildcardValue]) // move uses wildcard value that isn't available anymore (has 0% chance of occuring)
+			continue;
+		float& subScore = *(float*)(&scoreInt);
+		std::cout << "subscore " << subScore << std::endl;
+		assert(subScore < 1000);
 		float chance = remainderChance;
 		std::array<unsigned long, 2> wildcardCopies = { wildcards[wildcardValue == 0 ? 1 : 0], wildcards[wildcardValue == 2 ? 1 : 2] };
 		for (int i = 0; i < 25; i++) {
@@ -91,10 +95,13 @@ void ExploreNode::computeScore() {
 			wildcardCopies[0] >>= 1;
 			wildcardCopies[1] >>= 1;
 		}
-		partialScore += chance * score;
-		remainderChance -= chance;
+		if (chance == 1.f) {
+			partialScore += subScore;
+			break;
+		}
 
-		node.~ExploreNode();
+		partialScore += chance * subScore;
+		remainderChance -= chance;
 
 		wildcards[wildcardValue] &= ~consumedWildcards;
 		for (const auto& wildcard : wildcards)	// remainderChance should be 0 by now but because of inaccuracies lets just check if any wildcards are left for use instead
@@ -106,15 +113,20 @@ void ExploreNode::computeScore() {
 	// if any of the wildcard combinations are done at this point, no moves have been found so the score is zero for those (death)
 	// partialScore += remainderChance * 0;
 
+	assert(partialScore < 1000);
 	score = *(uint64_t*)&partialScore << 32 | (score & 0xffffffff);
+	uint64_t s = score >> 32;
+	//std::cout << "score " << partialScore << " " << *(float*)&(s) << std::endl;
 }
 
 void ExploreNode::cleanUp() {
 	assert(info.board.data[126] == 0 && info.board.data[125] == 0);
 	if (info.board.data[127] == 1)
-		for (auto i = info.childNodes.begin; i < info.childNodes.begin + (info.childNodes.wildcards_size & 0xffffffff); i++)
-			i->~ExploreNode();
+		for (auto it = info.childNodes.begin; it < info.childNodes.begin + (info.childNodes.wildcards_size & 0xffffffff); it++)
+			it->~ExploreNode();
+#ifndef NDEBUG
 	info.board.data[126] = 1;
+#endif
 }
 
 

@@ -5,7 +5,7 @@
 
 
 // basic eval that counts how many connections each cell has
-const float& Board::eval() const {
+const float Board::eval() const {
 	float score = 0;
 
 	constexpr Data randomMask = repeat(0b01111);
@@ -27,7 +27,7 @@ const float& Board::eval() const {
 	Data upRandom = (randoms >> 5*5 & randoms) | (randoms >> 5*5 & d123) | (d123 >> 5*5 & randoms);
 	score += (upRandom & upMask).count();
 
-
+	//std::cout << "calculated score: " << score << std::endl;
 
 	return score;
 }
