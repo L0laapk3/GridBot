@@ -18,6 +18,7 @@
 #include "ullong2array.hpp"
 #include "array2u_long_t.hpp"
 #include <bitset>
+#include <stdexcept>
 
 
 namespace Bitset2

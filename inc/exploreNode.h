@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include "board.h"
+#include "Board.h"
 
 
 class ExploreNode {

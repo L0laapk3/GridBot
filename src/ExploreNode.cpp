@@ -1,6 +1,6 @@
 
 
-#include "exploreNode.h"
+#include "ExploreNode.h"
 #include <cassert>
 
 ExploreNode::ExploreNode(const Board& board, const uint64_t& score) : score(score) {

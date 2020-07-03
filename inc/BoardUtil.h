@@ -71,32 +71,7 @@ constexpr Data maskedCompareToMask(Data const& a, Data const& b, Data const& mas
 	return cumul | cumul << 1 | cumul << 2 | cumul << 3 | cumul << 4;
 }
 
-constexpr Data expand(const Move& move, const unsigned int& valueInt = 0b11111) {
-	return Data(std::array<uint64_t, 2>{
-		_pdep_u64(move, 0b0001000010000100001000010000100001000010000100001000010000100001)* valueInt,
-			_pdep_u64(move >> 13, 0b0000000100001000010000100001000010000100001000010000100001000010)* valueInt + ((move >> 12) & 1)* (valueInt >> 4)
-	});
-}
+const Data expand(const Move& move, const unsigned int& valueInt = 0b11111);
+const uint64_t shrink(const Data& data);
 
-// NOT SURE WHY THIS CANT BE CONSTEXPR....
-uint64_t shrink(const Data& data) {
-	return _pext_u64(data.to_ullong(), 0b0001000010000100001000010000100001000010000100001000010000100001)
-		| (_pext_u64((data >> 64).to_ullong(), 0b0000000100001000010000100001000010000100001000010000100001000010) << 13);
-}
-
-
-void printRaw(const Data& data) {
-	unsigned long i = 0;
-	for (int j = 0; j < 5; j++) {
-		for (int k = 0; k < 5; k++) {
-			for (int m = 0; m < 5; m++) {
-				std::cout << ((data >> i)& Data(0b1)).to_ulong();
-				i++;
-			}
-			if (k < 4)
-				std::cout << " ";
-		}
-		std::cout << std::endl;
-	}
-	std::cout << std::endl;
-}
+const void printRaw(const Data& data);

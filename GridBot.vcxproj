@@ -159,6 +159,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BoardUtil.cpp" />
     <ClCompile Include="src\ExploreNode.cpp" />
     <ClCompile Include="src\Board.cpp" />
     <ClCompile Include="src\BoardEval.cpp" />
