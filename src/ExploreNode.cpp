@@ -3,13 +3,15 @@
 #include "ExploreNode.h"
 #include <cassert>
 
-ExploreNode::ExploreNode(const Board& board, const uint64_t& score) : score(score) {
+ExploreNode::ExploreNode(const Board& board, const unsigned long& move) {
 	info.board = board;
+	const float& scoreFloat = board.eval();
+	score = ((uint64_t)reinterpret_cast<const uint32_t&>(score) << 32) | move;
 	assert(info.board.data[127] == 0 && info.board.data[126] == 0 && info.board.data[125] == 0);
 }
 
 
-void ExploreNode::Explore() {
+void ExploreNode::explore(std::vector<ExploreNode*>& candidates) {
 	// will use the consumed wildcards in the lower 32 bits of prevScore
 #ifndef NDEBUG
 	assert(info.board.data[127] == 0 && info.board.data[126] == 0 && info.board.data[125] == 0);
@@ -18,13 +20,14 @@ void ExploreNode::Explore() {
 	bool first = true;
 	const uint64_t availableWildcards = shrink(andBits(info.board.data == repeat(0x0f)));
 	std::vector<ExploreNode> childNodes;
-	MoveFunc foundMove = [&](const Board& board, const unsigned long& consumedWildcards) {
-		const float& score = board.eval();
-		childNodes.push_back(ExploreNode(board, ((uint64_t)reinterpret_cast<const uint32_t&>(score) << 32) | consumedWildcards));
-	};
-	info.board.iterateMoves(foundMove);
+	info.board.iterateMoves([&](const Board& board, const unsigned long& move) {
+		childNodes.push_back(ExploreNode(board, move));
+	});
 
 	childNodes.shrink_to_fit();
+
+	for (ExploreNode& node : childNodes)
+		candidates.push_back(&node);
 
 	info.childNodes = {
 		childNodes.data(),
@@ -57,7 +60,7 @@ void ExploreNode::computeScore() {
 		std::partial_sort(i, i + 1, end, [](const ExploreNode& a, const ExploreNode& b) { return a.score > b.score; });
 		const ExploreNode& node = *i;
 		unsigned long consumedWildcards = (unsigned long)node.score;
-		const unsigned short wildcardValue = (node.score >> 25) & 0x3;
+		const unsigned short wildcardValue = (node.score >> 30) & 0x3;	// 00 = 2, 01 = 1, 10 = 3
 		if (consumedWildcards & ~wildcards[wildcardValue])
 			continue;	// move uses wildcard value that isn't available anymore (has 0% chance of occuring)
 

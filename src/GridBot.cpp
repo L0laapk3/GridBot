@@ -3,6 +3,7 @@
 
 #include "Conn.h"
 #include "Board.h"
+#include "Explore.h"
 
 
 Board board;
@@ -24,7 +25,7 @@ int __cdecl main(int argc, char** argv)
 		std::cout << "score: " << score << std::endl;
 		board.print();
 
-		const auto compressedMove = board.findBestMove();
+		const auto compressedMove = findBestMove(board);
 		if (compressedMove == 0)
 			break;
 		const auto move = board.decompressMove(compressedMove);

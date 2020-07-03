@@ -5,13 +5,16 @@
 #include <iostream>
 #include <cassert>
 
+#include "exploreNode.h"
+
 constexpr size_t TRIM_SIZE = 256;
-constexpr auto TIME_PER_MOVE = std::chrono::milliseconds(1000);
+constexpr auto TIME_PER_ACTION = std::chrono::milliseconds(000);
 
 
-uint32_t Board::findBestMove() const {
-	/*
-	std::vector<Candidate> candidates{};
+uint64_t findBestMove(const Board& board) {
+	
+	// possibly better to save score locally instead of pointer to it
+	std::vector<ExploreNode*> candidates;
 
 	uint64_t bestScore = 0;
 	auto sortBest = [&]() {
@@ -19,34 +22,34 @@ uint32_t Board::findBestMove() const {
 			candidates.begin(),
 			candidates.begin() + std::min(TRIM_SIZE, candidates.size()),
 			candidates.end(),
-			[](const Candidate& a, const Candidate& b) { return a.score > b.score; }
+			[](const ExploreNode* a, const ExploreNode* b) { return a->score > b->score; }
 		);
 		if (candidates.size() > TRIM_SIZE)
 			candidates.resize(TRIM_SIZE);
 
-		const Candidate best = candidates.front();
+		ExploreNode* best = candidates.front();
 		candidates.erase(candidates.begin());
-		if (best.score > bestScore)
-			bestScore = best.score;
+		if (best->score > bestScore)
+			bestScore = best->score;
 		return best;
 	};
 
 	auto beginTime = std::chrono::steady_clock::now();
 
-	iterateMoves([&](const Board& board, const Move& move) {
-		assert((move & 0x1ffffff) != 0b0);
-		//std::cout << std::bitset<25>(move) << std::endl;
-		candidates.push_back(Candidate(board, move));
+	std::vector<ExploreNode> topLevelMoves;
+	board.iterateMoves([&](const Board& board, const Move& move) {
+		topLevelMoves.push_back(ExploreNode(board, move));
 	});
+	// no more modifications to topLevelMoves after this point
+	for (auto& node : topLevelMoves)
+		candidates.push_back(&node);
 
 	uint64_t cycles = candidates.size();
 
-	while (std::chrono::steady_clock::now() - beginTime < TIME_PER_MOVE && candidates.size() > 0) {
-		auto best = sortBest();
+	while (std::chrono::steady_clock::now() - beginTime < TIME_PER_ACTION && candidates.size() > 0) {
+		auto* best = sortBest();
 		uint64_t startSize = candidates.size();
-		best.board.iterateMoves([&](const Board& board, const Move& move) {
-			candidates.push_back(Candidate(board, move));
-		});
+		best->explore(candidates);
 		cycles += candidates.size() - startSize;
 	}
 
@@ -60,8 +63,6 @@ uint32_t Board::findBestMove() const {
 	//	std::cout << (candidate.score >> 32) << " " << std::bitset<25>(candidate.score & 0x1ffffff) << std::endl;
 
 	return bestScore & 0xffffffff;
-	*/
-	return 0;
 }
 
 

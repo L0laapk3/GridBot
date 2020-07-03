@@ -8,15 +8,14 @@
 class ExploreNode {
 	public:
 		ExploreNode(const ExploreNode& exploreNode) = default;
-		ExploreNode(const Board& board, const uint64_t& score);
+		ExploreNode(const Board& board, const unsigned long& move);
 
-		void Explore();
+		void explore(std::vector<ExploreNode*>& candidates);
 		void computeScore();
 
 		~ExploreNode();
 
-	private:
-		uint64_t score; // upper 32 bits score, lower 32 bits consumed wildcards
+		uint64_t score; // upper 32 bits score, lower: 2b used wildcard value | 5b end cell location | 25b bitboard with moved cells
 		union Info {
 			Board board;
 			struct childNodes {

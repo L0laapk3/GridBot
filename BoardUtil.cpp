@@ -27,6 +27,6 @@ const Data expand(const Move& move, const unsigned int& valueInt) {
 }
 
 const uint64_t shrink(const Data& data) {
-	return _pext_u64(data.to_ullong(), 0b0001000010000100001000010000100001000010000100001000010000100001)
+	return _pext_u64((data & Data(~(uint64_t)0)).to_ullong(), 0b0001000010000100001000010000100001000010000100001000010000100001)
 		| (_pext_u64((data >> 64).to_ullong(), 0b0000000100001000010000100001000010000100001000010000100001000010) << 13);
 }

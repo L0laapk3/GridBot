@@ -28,7 +28,7 @@ Conn::Conn(const std::string name) {
     // Initialize Winsock
     iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
     if (iResult != 0) {
-        printf("WSAStartup failed with error: %d\n", iResult);
+        std::cout << "WSAStartup failed with error: " << iResult << std::endl;
         exit(1);
     }
 
@@ -40,9 +40,9 @@ Conn::Conn(const std::string name) {
     // Resolve the server address and port
     iResult = getaddrinfo("35.193.192.221", "32123", &hints, &result);
     if (iResult != 0) {
-        printf("getaddrinfo failed with error: %d\n", iResult);
+        std::cout << "getaddrinfo failed with error: " << iResult << std::endl;
         WSACleanup();
-        exit(1);
+        exit(2);
     }
 
     // Attempt to connect to an address until one succeeds
@@ -52,9 +52,9 @@ Conn::Conn(const std::string name) {
         ConnectSocket = socket(ptr->ai_family, ptr->ai_socktype,
             ptr->ai_protocol);
         if (ConnectSocket == INVALID_SOCKET) {
-            printf("socket failed with error: %ld\n", WSAGetLastError());
+            std::cout << "socket failed with error: " << WSAGetLastError() << std::endl;
             WSACleanup();
-            exit(1);
+            exit(3);
         }
 
         // Connect to server.
@@ -70,9 +70,9 @@ Conn::Conn(const std::string name) {
     freeaddrinfo(result);
 
     if (ConnectSocket == INVALID_SOCKET) {
-        printf("Unable to connect to server!\n");
+        std::cout << "Unable to connect to server!" << std::endl;
         WSACleanup();
-        exit(1);
+        exit(4);
     }
 
     sendData("\"" + name + "\"\n");
@@ -88,10 +88,10 @@ void Conn::sendData(const std::string& msg) {
     // Send an initial buffer
     int iResult = send(ConnectSocket, sendbuf, len, 0);
     if (iResult == SOCKET_ERROR) {
-        printf("send failed with error: %d\n", WSAGetLastError());
+        std::cout << "send failed with error: " << WSAGetLastError() << std::endl;
         closesocket(ConnectSocket);
         WSACleanup();
-        exit(1);
+        exit(5);
     }
 }
 
@@ -99,10 +99,10 @@ void Conn::close() {
     // shutdown the connection since no more data will be sent
     int iResult = shutdown(ConnectSocket, SD_SEND);
     if (iResult == SOCKET_ERROR) {
-        printf("shutdown failed with error: %d\n", WSAGetLastError());
+        std::cout << "shutdown failed with error: " << WSAGetLastError() << std::endl;
         closesocket(ConnectSocket);
         WSACleanup();
-        exit(1);
+        exit(6);
     }
 }
 
@@ -129,7 +129,7 @@ void Conn::receiveBoard(Board& board) {
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
-    //std::cout << s << std::endl;
+    std::cout << s << std::endl;
     board.set(s);
 };
 

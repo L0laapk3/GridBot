@@ -33,13 +33,13 @@
     <ClCompile Include="src\ExploreNode.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\BoardSearch.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\BoardMoves.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="BoardUtil.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Explore.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -60,6 +60,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="inc\BoardUtil.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\Explore.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

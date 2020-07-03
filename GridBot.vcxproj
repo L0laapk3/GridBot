@@ -163,7 +163,7 @@
     <ClCompile Include="src\ExploreNode.cpp" />
     <ClCompile Include="src\Board.cpp" />
     <ClCompile Include="src\BoardEval.cpp" />
-    <ClCompile Include="src\BoardSearch.cpp" />
+    <ClCompile Include="src\Explore.cpp" />
     <ClCompile Include="src\BoardMoves.cpp" />
     <ClCompile Include="src\GridBot.cpp" />
     <ClCompile Include="src\Conn.cpp" />
@@ -171,6 +171,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="inc\BoardUtil.h" />
+    <ClInclude Include="inc\Explore.h" />
     <ClInclude Include="lib\bitset2\bitset2.hpp" />
     <ClInclude Include="inc\ExploreNode.h" />
     <ClInclude Include="inc\Board.h" />

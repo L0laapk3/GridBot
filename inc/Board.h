@@ -31,7 +31,6 @@ public:
 	void print() const;
 	void set(const std::string& str);
 
-	uint32_t findBestMove() const;
 	void iterateMoves(MoveFunc cb) const;
 
 	std::vector<int> decompressMove(const Move& move) const;
