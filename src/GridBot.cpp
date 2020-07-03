@@ -21,8 +21,6 @@ int __cdecl main(int argc, char** argv)
 	int score = 0;
 	while (true) {
 		conn.receiveBoard(board);
-
-		std::cout << "score: " << score << std::endl;
 		board.print();
 
 		const auto compressedMove = findBestMove(board);
@@ -31,10 +29,10 @@ int __cdecl main(int argc, char** argv)
 		const auto move = board.decompressMove(compressedMove);
 		score += move.size() * board.valueAt(5 * move[0]);
 		conn.sendMove(move);
-		std::cout << "=====================================================" << std::endl;
-	}
 
-	std::cout << "final score: " << score << std::endl;
+		std::cout << "===================================================" << std::endl;
+		std::cout << "score: " << score << std::endl;
+	}
 
 	conn.close();
 }

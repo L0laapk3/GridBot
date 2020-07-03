@@ -9,7 +9,7 @@
 
 
 // only care about moves that contain MAXRAND or less wildcard cells.
-constexpr int MAXRAND = 0;
+constexpr int MAXRAND = 10;
 
 
 void Board::iterateMoves(MoveFunc cb) const {
@@ -23,7 +23,7 @@ void Board::iterateMoves(MoveFunc cb) const {
 		const Move move = shiftAmount > 0 ? cells << shiftAmount : cells >> -shiftAmount;
 		if (((oldValue & Data(0x1f)) ^ Data(0x0f)).any()) {
 			const uint64_t wildcardValue = oldValue[4] ? 2 : oldValue[0];
-			const Data shiftedCells = expand(move) | Data(wildcardValue << 30);
+			const Data shiftedCells = expand(move);
 			short n = (short)(oldValue & Data(0x0f)).to_ulong();
 			int l = length;
 			while ((l & 0b1) == 0b0) {
@@ -46,19 +46,19 @@ void Board::iterateMoves(MoveFunc cb) const {
 			//board2.print();
 			//std::cout << std::bitset<25>(move) << " " << std::bitset<25>(cells) << std::endl;
 			assert((Bitset2::bitset2<25>(move).count()) == length);
-			cb(board1, move + (first << 25)); // lowest 25 bits are bitboard, next 5 bits are end position, last 2 bits are old cell value
-			cb(board2, move + (second << 25));
+			cb(board1, move | (uint64_t)wildcardValue << 30 | (first << 25)); // lowest 25 bits are bitboard, next 5 bits are end position, last 2 bits are old cell value
+			cb(board2, move | (uint64_t)wildcardValue << 30 | (second << 25));
 		}
 		else
 			for (int wildcardValue = 0; wildcardValue < 3; wildcardValue++) {
 				const auto& value = std::array<int, 3>{ 0x01, 0x02, 0x10 }[wildcardValue];
-				const Data shiftedCells = expand(move) | Data((uint64_t)wildcardValue << 30);
+				const Data shiftedCells = expand(move);
 				auto newCell = Data(value);
 				const Board board1 = Board(data & ~shiftedCells | (shiftedCells & ~cell(0b11111, 5 * first) & repeat(0b01111)) | newCell << (5 * first));
 				const Board board2 = Board(data & ~shiftedCells | (shiftedCells & ~cell(0b11111, 5 * second) & repeat(0b01111)) | newCell << (5 * second));
 				assert((Bitset2::bitset2<25>(move).count()) == length);
-				cb(board1, move + (first << 25));
-				cb(board2, move + (second << 25));
+				cb(board1, move | (uint64_t)wildcardValue << 30 | (first << 25));
+				cb(board2, move | (uint64_t)wildcardValue << 30 | (second << 25));
 			}
 	};
 

@@ -1,17 +1,19 @@
 
 
 #include "ExploreNode.h"
+
 #include <cassert>
+
+
 
 ExploreNode::ExploreNode(const Board& board, const unsigned long& move) {
 	info.board = board;
-	const float& scoreFloat = board.eval();
-	score = ((uint64_t)reinterpret_cast<const uint32_t&>(score) << 32) | move;
+	score = *(uint64_t*)&board.eval() << 32 | move;
 	assert(info.board.data[127] == 0 && info.board.data[126] == 0 && info.board.data[125] == 0);
 }
 
 
-void ExploreNode::explore(std::vector<ExploreNode*>& candidates) {
+void ExploreNode::explore(std::vector<Candidate>& candidates) {
 	// will use the consumed wildcards in the lower 32 bits of prevScore
 #ifndef NDEBUG
 	assert(info.board.data[127] == 0 && info.board.data[126] == 0 && info.board.data[125] == 0);
@@ -26,27 +28,41 @@ void ExploreNode::explore(std::vector<ExploreNode*>& candidates) {
 
 	childNodes.shrink_to_fit();
 
-	for (ExploreNode& node : childNodes)
-		candidates.push_back(&node);
+	for (ExploreNode& node : childNodes) {
+		assert(node.info.board.data[127] == 0);
+		candidates.push_back(Candidate{ node.score, &node });
+	}
+	for (const auto& candidate : candidates)
+		assert(candidate.node->info.board.data[127] == 0);
 
 	info.childNodes = {
 		childNodes.data(),
 		availableWildcards << 32 | childNodes.size()
 	};
 
+
+	for (const auto& candidate : candidates)
+		assert(candidate.node->info.board.data[127] == 0);
+
+	info.board.data[127] = 1;
+
+
+	for (const auto& candidate : candidates)
+		assert(this != candidate.node);
+
 	// shitty hack to steal ownership of the now array on the heap.
 	new (&childNodes) std::vector<ExploreNode>; 
+
 }
 
 
 void ExploreNode::computeScore() {
-#ifndef NDEBUG
-	assert((info.board.data[127] == 0 && info.board.data[126] == 0 && info.board.data[125] == 0)
-		|| (info.board.data[127] == 1 && info.board.data[126] == 0 && info.board.data[125] == 0));
-	info.board.data[126] = 1;
-#endif
+	assert(info.board.data[126] == 0 && info.board.data[125] == 0);
 	if (info.board.data[127] == 0) // this node has not been deepened, it has no child nodes so the score is directly the heuristic score
 		return;
+#ifndef NDEBUG
+	info.board.data[126] = 1;
+#endif
 
 	// calculate score based on children, resolve dependencies in used wildcards and shit
 	const auto& end = info.childNodes.begin + (info.childNodes.wildcards_size & 0xffffffff);
@@ -65,7 +81,7 @@ void ExploreNode::computeScore() {
 			continue;	// move uses wildcard value that isn't available anymore (has 0% chance of occuring)
 
 		uint32_t scoreInt = node.score >> 32;
-		float& score = reinterpret_cast<float&>(scoreInt);
+		float& score = *(float*)(&scoreInt);
 		float chance = remainderChance;
 		std::array<unsigned long, 2> wildcardCopies = { wildcards[wildcardValue == 0 ? 1 : 0], wildcards[wildcardValue == 2 ? 1 : 2] };
 		for (int i = 0; i < 25; i++) {
@@ -78,14 +94,27 @@ void ExploreNode::computeScore() {
 		partialScore += chance * score;
 		remainderChance -= chance;
 
+		node.~ExploreNode();
+
 		wildcards[wildcardValue] &= ~consumedWildcards;
-		for (const auto& wildcard : wildcards)	// chance should be 0 by now but because of inaccuracies lets just check if any wildcards are left for use instead
+		for (const auto& wildcard : wildcards)	// remainderChance should be 0 by now but because of inaccuracies lets just check if any wildcards are left for use instead
 			if (wildcard != 0)
-				goto cnt;
+				continue; // if any are left, continue
+
 		break;
-		cnt:;
 	}
-	score = ((uint64_t)reinterpret_cast<uint32_t&>(partialScore) << 32) | (score & 0xffffffff);
+	// if any of the wildcard combinations are done at this point, no moves have been found so the score is zero for those (death)
+	// partialScore += remainderChance * 0;
+
+	score = *(uint64_t*)&partialScore << 32 | (score & 0xffffffff);
+}
+
+void ExploreNode::cleanUp() {
+	assert(info.board.data[126] == 0 && info.board.data[125] == 0);
+	if (info.board.data[127] == 1)
+		for (auto i = info.childNodes.begin; i < info.childNodes.begin + (info.childNodes.wildcards_size & 0xffffffff); i++)
+			i->~ExploreNode();
+	info.board.data[126] = 1;
 }
 
 
