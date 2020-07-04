@@ -69,10 +69,11 @@ void foundMove(std::vector<ExploreNode>& childNodes, const Data& data, const int
 	}
 }
 
+
+
 void Board::iterateMoves(std::vector<ExploreNode>& childNodes) const {
 	//std::cout << "exploring.." << std::endl;
 	//print();
-
 
 
 	constexpr auto randomGrid = repeat(0x0f);

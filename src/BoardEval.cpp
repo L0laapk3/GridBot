@@ -5,7 +5,7 @@
 
 
 
-constexpr std::array<float, 13> WEIGHTS{ 0, 0, 0, 1, 0, 0, 0, 0, 2, 4, 8, 16, 32 };
+constexpr std::array<float, 13> WEIGHTS{ 0, 0, 0, 0,0,0,0,0, 0, 0, 1, 4, 16 };
 constexpr std::array<float, 25> ALTMAP1{ 4, 3, 2, 1, 0, 9, 8, 7, 6, 5, 14, 13, 12, 11, 10, 19, 18, 17, 16, 15, 24, 23, 22, 21, 20 };
 constexpr std::array<float, 25> ALTMAP2{ 0, 5, 10, 15, 20, 1, 6, 11, 16, 21, 2, 7, 12, 17, 22, 3, 8, 13, 18, 23, 4, 9, 14, 19, 24 };
 constexpr std::array<float, 25> ALTMAP3{ 20, 15, 10, 5, 0, 21, 16, 11, 6, 1, 22, 17, 12, 7, 2, 23, 18, 13, 8, 3, 24, 19, 14, 9, 4 };
@@ -16,7 +16,8 @@ const float Board::eval() const {
 
 	float scoreSurvivability = 0;
 
-	const Data randoms = andBits(data == repeat(0x0f));
+	//possible error?
+	const Data randoms = andBits(data == repeat(0x0f)) & repeat(0x1);
 	const Data randomMask = toMask(randoms);
 	const Data noRandoms = data & ~randomMask;
 
@@ -26,11 +27,11 @@ const float Board::eval() const {
 	{
 		const Data left = andBits(data == data >> 5);
 		constexpr Data leftMask = repeat(0x01, 1, 0);
-		scoreSurvivability += 3 * (left & ~randoms & leftMask).count();
+		scoreSurvivability += 3 * (left & ~randomMask & leftMask).count();
 
 		const Data up = andBits(data == data >> 5 * 5);
 		constexpr Data upMask = repeat(0x01, 0, 1);
-		scoreSurvivability += 3 * (up & ~randoms & upMask).count();
+		scoreSurvivability += 3 * (up & ~randomMask & upMask).count();
 
 		//printRaw(randoms);
 		//std::cout << "^ randoms, \\/ d123" << std::endl;
@@ -46,7 +47,7 @@ const float Board::eval() const {
 
 
 
-	float scoreMonotonic = 0;
+	float scoreMonotonicity = 0;
 	const Data withoutThrees = ((data ^ randomMask) & repeat(0x0f)) + ((data ^ randomMask) >> 4 & repeat(0x01));
 	{
 		const Data leftSubtract = withoutThrees + (withoutThrees >> 5 ^ repeat(0x0f)) + repeat(0x01);
@@ -54,7 +55,7 @@ const float Board::eval() const {
 		const Data leftRowSum = (leftRowHalfSum & repeatRow(0b111111)) + ((leftRowHalfSum & repeatRow(0b1111110000000000)) >> 10);
 		const Data leftRowNeg = ~leftRowSum & repeatRow(0b1000000);
 		const Data leftRowAbs = (leftRowSum ^ (leftRowNeg >> 1 | leftRowNeg >> 2 | leftRowNeg >> 3 | leftRowNeg >> 4 | leftRowNeg >> 5 | leftRowNeg >> 6)) + (leftRowNeg >> 6);
-		scoreMonotonic += (leftRowAbs & Data(0x3f)).to_ullong()
+		scoreMonotonicity += (leftRowAbs & Data(0x3f)).to_ullong()
 			+ (leftRowAbs >>  5*5 & Data(0x3f)).to_ullong()
 			+ (leftRowAbs >> 10*5 & Data(0x3f)).to_ullong()
 			+ (leftRowAbs >> 15*5 & Data(0x3f)).to_ullong()
@@ -77,7 +78,7 @@ const float Board::eval() const {
 		const uint64_t upColNegSecondHalf = ~upColSumSecondHalf & ((secondHalf << 2) & repeatCol(0b1000000)).to_ullong();
 		const uint64_t upColAbsFirstHalf = (upColSumFirstHalf ^ (upColNegFirstHalf >> 1 | upColNegFirstHalf >> 2 | upColNegFirstHalf >> 3 | upColNegFirstHalf >> 4 | upColNegFirstHalf >> 5 | upColNegFirstHalf >> 6)) + (upColNegFirstHalf >> 6);
 		const uint64_t upColAbsSecondHalf = (upColSumSecondHalf ^ (upColNegSecondHalf >> 1 | upColNegSecondHalf >> 2 | upColNegSecondHalf >> 3 | upColNegSecondHalf >> 4 | upColNegSecondHalf >> 5 | upColNegSecondHalf >> 6)) + (upColNegSecondHalf >> 6);
-		scoreMonotonic += (upColAbsFirstHalf & 0x3f)
+		scoreMonotonicity += (upColAbsFirstHalf & 0x3f)
 			+ (upColAbsSecondHalf >> 5 & 0x3f)
 			+ (upColAbsFirstHalf >> 10 & 0x3f)
 			+ (upColAbsSecondHalf >> 15 & 0x3f)
@@ -112,5 +113,19 @@ const float Board::eval() const {
 
 
 
-	return scoreSurvivability;// +scoreWeighted;// +4 * scoreContinuity;
+
+	const Data threes = noRandoms & repeat(0x10);
+	const Data powerOfTwo = (noRandoms & repeat(0xf) & (noRandoms >> 1 | noRandoms >> 2 | noRandoms >> 3 | repeat(0xe))) | randoms;
+	const Data hasThree = ~powerOfTwo | threes >> 1 | threes >> 2 | threes >> 3 | threes >> 4;
+
+	//std::cout << (hasThree & repeat(0x1)).count() << " " << (hasThree & repeat(0x2)).count() << " " << (hasThree & repeat(0x4)).count() << " " << (hasThree & repeat(0x8)).count() << std::endl;
+
+	const float scoreThrees = (hasThree & repeat(0x1)).count()
+		+ (hasThree & repeat(0x2)).count() * 2*2
+		+ (hasThree & repeat(0x4)).count() * 4*4
+		+ (hasThree & repeat(0x8)).count() * 8*8;
+
+
+
+	return 4 * scoreSurvivability + scoreThrees;// +scoreWeighted / 8;// +4 * scoreContinuity;
 }

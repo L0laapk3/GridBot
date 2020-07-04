@@ -29,7 +29,4 @@ class ExploreNode {
 			Info() {};
 			~Info() {};
 		} info;
-
-	private:
-		void dealloc();
 };
