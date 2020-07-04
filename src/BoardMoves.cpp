@@ -6,13 +6,14 @@
 
 #include <initializer_list>
 
+#include "exploreNode.h"
 
 
 // only care about moves that contain MAXRAND or less wildcard cells.
 constexpr int MAXRAND = 8;
 
 
-void Board::iterateMoves(MoveFunc cb) const {
+void Board::iterateMoves(std::vector<ExploreNode>& childNodes) const {
 	//std::cout << "exploring.." << std::endl;
 	//print();
 	auto foundMove = [&](const int& first, const int& second, const int& length, const Data& oldValue, const Move& cells, const int& cellShift, const int& numWildcards) {
@@ -51,8 +52,8 @@ void Board::iterateMoves(MoveFunc cb) const {
 			//board2.print();
 			//std::cout << std::bitset<25>(move) << " " << std::bitset<25>(cells) << std::endl;
 			assert((Bitset2::bitset2<25>(move).count()) == length);
-			cb(board1, move | (uint64_t)wildcardValue << 30 | (first << 25)); // lowest 25 bits are bitboard, next 5 bits are end position, last 2 bits are old cell value
-			cb(board2, move | (uint64_t)wildcardValue << 30 | (second << 25));
+			childNodes.push_back(ExploreNode(board1, move | (uint64_t)wildcardValue << 30 | (first << 25))); // lowest 25 bits are bitboard, next 5 bits are end position, last 2 bits are old cell value
+			childNodes.push_back(ExploreNode(board2, move | (uint64_t)wildcardValue << 30 | (second << 25)));
 		}
 		else {
 			//std::cout << "one with only wildcards" << std::endl;
@@ -63,8 +64,8 @@ void Board::iterateMoves(MoveFunc cb) const {
 				const Board board1 = Board(data & ~shiftedCells | (shiftedCells & ~cell(0b11111, 5 * first) & repeat(0b01111)) | newCell << (5 * first));
 				const Board board2 = Board(data & ~shiftedCells | (shiftedCells & ~cell(0b11111, 5 * second) & repeat(0b01111)) | newCell << (5 * second));
 				assert((Bitset2::bitset2<25>(move).count()) == length);
-				cb(board1, move | (uint64_t)wildcardValue << 30 | (first << 25));
-				cb(board2, move | (uint64_t)wildcardValue << 30 | (second << 25));
+				childNodes.push_back(ExploreNode(board1, move | (uint64_t)wildcardValue << 30 | (first << 25)));
+				childNodes.push_back(ExploreNode(board2, move | (uint64_t)wildcardValue << 30 | (second << 25)));
 			}
 		}
 	};

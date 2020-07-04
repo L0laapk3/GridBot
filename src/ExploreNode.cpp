@@ -25,11 +25,8 @@ std::span<ExploreNode> ExploreNode::explore() {
 
 	bool first = true;
 	const uint64_t availableWildcards = shrink(andBits(info.board.data == repeat(0x0f)));
-	std::vector<ExploreNode> childNodes;
-	info.board.iterateMoves([&](const Board& board, const unsigned long& move) {
-		childNodes.push_back(ExploreNode(board, move));
-		//std::cout << (childNodes.back().score >> 32) << " " << std::bitset<25>(move & availableWildcards) << std::endl;
-	});
+	std::vector<ExploreNode, std::allocator<ExploreNode>> childNodes;
+	info.board.iterateMoves(childNodes);
 
 	childNodes.shrink_to_fit();
 

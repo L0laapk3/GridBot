@@ -9,16 +9,14 @@
 
 
 typedef Bitset2::bitset2<128> Data;
-typedef uint32_t Move;
+typedef unsigned long Move;
 
 #include "BoardUtil.h"
 
-class Board;
-typedef std::function<void(const Board&, const Move&)> MoveFunc;
 
 
 
-
+class ExploreNode;
 class Board {
 public:
 	Board();
@@ -31,7 +29,7 @@ public:
 	void print() const;
 	void set(const std::string& str);
 
-	void iterateMoves(MoveFunc cb) const;
+	void iterateMoves(std::vector<ExploreNode>& childNodes) const;
 
 	std::vector<int> decompressMove(const Move& move) const;
 

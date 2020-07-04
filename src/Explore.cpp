@@ -20,11 +20,7 @@ unsigned long findBestMove(const Board& board) {
 	auto beginTime = std::chrono::steady_clock::now();
 
 	std::vector<ExploreNode> topLevelMoves{};
-	board.iterateMoves([&](const Board& nextBoard, const Move& move) {
-		//std::cout << std::bitset<2>(move >> 30) << " " << std::bitset<5>(move >> 25) << " " << std::bitset<25>(move) << std::endl;
-		topLevelMoves.push_back(ExploreNode(nextBoard, move));
-		assert(topLevelMoves.back().info.board.data[127] == 0);
-	});
+	board.iterateMoves(topLevelMoves);
 	// no more modifications to topLevelMoves after this point
 
 
