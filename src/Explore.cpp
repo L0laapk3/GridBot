@@ -9,11 +9,10 @@
 
 
 #if 0
-	constexpr size_t TRIM_SIZE = 1 << 15 | 1 << 14;
-	constexpr auto TIME_PER_ACTION = std::chrono::milliseconds(1000);
+constexpr size_t TRIM_SIZE = 1 << 15 | 1 << 14;
+constexpr auto TIME_PER_ACTION = std::chrono::milliseconds(1000);
 #else
-
-constexpr size_t TRIM_SIZE = 1 << 17;
+constexpr size_t TRIM_SIZE = 1 << 19;
 constexpr auto TIME_PER_ACTION = std::chrono::milliseconds(10000);
 #endif
 
