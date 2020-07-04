@@ -13,7 +13,9 @@ constexpr int MAXRAND = 8;
 
 
 void Board::iterateMoves(MoveFunc cb) const {
-	auto foundMove = [&](const int& first, const int& second, const int& length, const Data& oldValue, const Move& cells, const int& cellShift) {
+	//std::cout << std::endl;
+	//print();
+	auto foundMove = [&](const int& first, const int& second, const int& length, const Data& oldValue, const Move& cells, const int& cellShift, const int& numWildcards) {
 		if (oldValue[4] == 0b1 && (length == 3 || length == 6))
 			return;
 		//std::cout << "found move of length " << length << ", first=" << first << ", second=" << second << ", cshift=" << cellShift << std::endl;
@@ -21,6 +23,9 @@ void Board::iterateMoves(MoveFunc cb) const {
 		assert(Bitset2::bitset2<25>(cells).count() == length);
 		const int shiftAmount = first - cellShift;
 		const Move move = shiftAmount > 0 ? cells << shiftAmount : cells >> -shiftAmount;
+		//std::cout << "numwildcards " << numWildcards << " " << std::bitset<25>(shrink(andBits((data) == repeat(0x1f)))) << " " << std::bitset<25>(move) << std::endl;
+		assert(numWildcards == Data(shrink(andBits((data) == repeat(0x1f))) & move).count());
+
 		if (((oldValue & Data(0x1f)) ^ Data(0x0f)).any()) {
 			const uint64_t wildcardValue = oldValue[4] ? 2 : oldValue[0];
 			const Data shiftedCells = expand(move);
@@ -49,7 +54,8 @@ void Board::iterateMoves(MoveFunc cb) const {
 			cb(board1, move | (uint64_t)wildcardValue << 30 | (first << 25)); // lowest 25 bits are bitboard, next 5 bits are end position, last 2 bits are old cell value
 			cb(board2, move | (uint64_t)wildcardValue << 30 | (second << 25));
 		}
-		else
+		else {
+			//std::cout << "one with only wildcards" << std::endl;
 			for (int wildcardValue = 0; wildcardValue < 3; wildcardValue++) {
 				const auto& value = std::array<int, 3>{ 0x01, 0x02, 0x10 }[wildcardValue];
 				const Data shiftedCells = expand(move);
@@ -60,6 +66,7 @@ void Board::iterateMoves(MoveFunc cb) const {
 				cb(board1, move | (uint64_t)wildcardValue << 30 | (first << 25));
 				cb(board2, move | (uint64_t)wildcardValue << 30 | (second << 25));
 			}
+		}
 	};
 
 
@@ -84,18 +91,21 @@ void Board::iterateMoves(MoveFunc cb) const {
 			for (int i = 0; i <= std::min(length, MAXRAND); i++) {
 				if (i < length) {
 					const Data shifted = direction < 0 ? prevDatas[i] >> (-5 * direction) : prevDatas[i] << (5 * direction);
-					const Data shiftedNoRandom = shifted & ~randomMask | prevToNextRandLevel;
-					prevToNextRandLevel = shifted | randomMask;
+					const Data shiftedNoRandom = (shifted & ~randomMask) | prevToNextRandLevel;
+					prevToNextRandLevel = shifted & randomMask;
 					datas[i] = shiftedNoRandom & maskedCompareToMask(shiftedNoRandom, data, mask);
-				} else
+				} else {
+					//std::cout << "moves consisting of only wildcards" << std::endl;
 					datas[i] = repeat(0x0f) & maskedCompareToMask(prevToNextRandLevel, data, mask);
+				}
+				//printRaw(prevToNextRandLevel);
 
 				if (datas[i].any()) {
 					if (newMoves->end) {
 						const Data finishedPath = datas[i] | datas[i] >> 1 | datas[i] >> 2 | datas[i] >> 3 | datas[i] >> 4;
 						for (int j = 0; j < 25; j++)
 							if (finishedPath[5 * j])
-								foundMove(j, j + newEnd, length, (datas[i] >> (5 * j)), newCells, newCellShift);
+								foundMove(j, j + newEnd, length, (datas[i] >> (5 * j)), newCells, newCellShift, i);
 					}
 					hasAtLeastOneResult = true;
 				}
@@ -113,7 +123,7 @@ void Board::iterateMoves(MoveFunc cb) const {
 	std::array<Data, MAXRAND+1> datas;
 	datas[0] = data & ~randomMask;
 	if (MAXRAND >= 1)
-		datas[1] = data | randomMask;
+		datas[1] = randomMask;
 	for (int i = 2; i <= MAXRAND; i++)
 		datas[i] = Data(0);
 	exploreCombinations(datas, &ALLMOVES, 2, 0, 0b1, 0);

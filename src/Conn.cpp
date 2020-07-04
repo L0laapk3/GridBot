@@ -129,7 +129,7 @@ void Conn::receiveBoard(Board& board) {
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
-    std::cout << s << std::endl;
+    //std::cout << s << std::endl;
     board.set(s);
 };
 

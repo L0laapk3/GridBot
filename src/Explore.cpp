@@ -8,7 +8,7 @@
 #include <cassert>
 
 
-constexpr size_t TRIM_SIZE = 1024;
+constexpr size_t TRIM_SIZE = 1 << 12;
 constexpr auto TIME_PER_ACTION = std::chrono::milliseconds(1000);
 
 
@@ -16,6 +16,8 @@ unsigned long findBestMove(const Board& board) {
 	
 	// possibly better to save score locally instead of pointer to it
 	std::vector<Candidate> candidates{};
+	uint64_t lowestBest = UINT64_MAX;
+	uint64_t highestTrimmed = 0;
 
 	auto sortBest = [&]() {
 		for (const auto& candidate : candidates)
@@ -31,11 +33,15 @@ unsigned long findBestMove(const Board& board) {
 			candidates.end(),
 			[](const Candidate& a, const Candidate& b) { return a.score > b.score; }
 		);
-		if (candidates.size() > TRIM_SIZE)
+		if (candidates.size() > TRIM_SIZE) {
+			highestTrimmed = std::max(highestTrimmed, candidates[candidates.size()].score);
 			candidates.resize(TRIM_SIZE);
+		}
 
 		const Candidate best = candidates.front();
 		candidates.erase(candidates.begin());
+
+		lowestBest = std::min(lowestBest, best.score);
 
 		for (auto& candidate : candidates)
 			assert(&best != &candidate);
@@ -49,9 +55,9 @@ unsigned long findBestMove(const Board& board) {
 	auto beginTime = std::chrono::steady_clock::now();
 
 	std::vector<ExploreNode> topLevelMoves{};
-	board.iterateMoves([&](const Board& board, const Move& move) {
+	board.iterateMoves([&](const Board& nextBoard, const Move& move) {
 		//std::cout << std::bitset<2>(move >> 30) << " " << std::bitset<5>(move >> 25) << " " << std::bitset<25>(move) << std::endl;
-		topLevelMoves.push_back(ExploreNode(board, move));
+		topLevelMoves.push_back(ExploreNode(nextBoard, move));
 		assert(topLevelMoves.back().info.board.data[127] == 0);
 	});
 	// no more modifications to topLevelMoves after this point
@@ -100,7 +106,11 @@ unsigned long findBestMove(const Board& board) {
 	//	std::cout << "score " << *(float*)&(s) << std::endl;
 	//}
 	uint64_t s = bestCandidate->score >> 32;
-	std::cout << "bestScore " << *(float*)&(s) << std::endl;
+	std::cout << "move rating: " << *(float*)&s << std::endl;
+
+	lowestBest = lowestBest >> 32;
+	highestTrimmed = highestTrimmed >> 32;
+	std::cout << "lowest best: " << *(float*)&lowestBest << ", highest trimmed: " << *(float*)&highestTrimmed << std::endl;
 
 	return bestCandidate->score & 0xffffffff;
 }
