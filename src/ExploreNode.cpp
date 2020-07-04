@@ -35,10 +35,10 @@ void ExploreNode::explore(Candidates& candidates) {
 
 	for (ExploreNode& node : childNodes) {
 		assert(node.info.board.data[127] == 0);
-		candidates.push(Candidate{ node.score, &node });
+		candidates.push_back(Candidate{ node.score, &node });
 	}
-	//for (const auto& candidate : candidates)
-	//	assert(candidate.node->info.board.data[127] == 0);
+	for (const auto& candidate : candidates)
+		assert(candidate.node->info.board.data[127] == 0);
 
 	//std::cout << std::bitset<25>(availableWildcards) << std::endl;
 	info.childNodes = {
@@ -47,14 +47,14 @@ void ExploreNode::explore(Candidates& candidates) {
 	};
 
 
-	//for (const auto& candidate : candidates)
-	//	assert(candidate.node->info.board.data[127] == 0);
+	for (const auto& candidate : candidates)
+		assert(candidate.node->info.board.data[127] == 0);
 
 	info.board.data[127] = 1;
 
 
-	//for (const auto& candidate : candidates)
-	//	assert(this != candidate.node);
+	for (const auto& candidate : candidates)
+		assert(this != candidate.node);
 
 	// shitty hack to steal ownership of the now array on the heap.
 	new (&childNodes) std::vector<ExploreNode>; 

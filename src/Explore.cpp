@@ -17,28 +17,25 @@ unsigned long findBestMove(const Board& board) {
 	
 	// possibly better to save score locally instead of pointer to it
 	Candidates candidates{};
-	uint64_t lowestBest = UINT64_MAX;
-	uint64_t highestTrimmed = 0;
 
 	auto sortBest = [&]() {
-		//for (const auto& candidate : candidates)
-		//	assert(candidate.node->info.board.data[127] == 0);
+		for (const auto& candidate : candidates)
+			assert(candidate.node->info.board.data[127] == 0);
 
 		for (int i = 0; i < candidates.size(); i++)
 			for (int j = i + 1; j < candidates.size(); j++)
 				assert(candidates[i].node != candidates[j].node);
 
 
-		const Candidate best = candidates.top();
-		candidates.pop();
+		const auto it = std::max_element(candidates.begin(), candidates.end(), [](const Candidate& a, const Candidate& b) { return a.score < b.score; });
+		const Candidate best = *it;
+		candidates.erase(it);
 
-		lowestBest = std::min(lowestBest, best.score);
+		for (auto& candidate : candidates)
+			assert(&best != &candidate);
 
-		//for (auto& candidate : candidates)
-		//	assert(&best != &candidate);
-
-		//for (auto& candidate : candidates)
-		//	assert(best.node != candidate.node);
+		for (auto& candidate : candidates)
+			assert(best.node != candidate.node);
 
 		return best.node;
 	};
@@ -55,25 +52,25 @@ unsigned long findBestMove(const Board& board) {
 
 
 	for (auto& node : topLevelMoves) {
-		candidates.push(Candidate{ node.score, &node });
+		candidates.push_back(Candidate{ node.score, &node });
 		assert(candidates.back().node->info.board.data[127] == 0);
 	}
-	//for (const auto& candidate : candidates)
-	//	assert(candidate.node->info.board.data[127] == 0);
+	for (const auto& candidate : candidates)
+		assert(candidate.node->info.board.data[127] == 0);
 
 	uint64_t cycles = candidates.size();
 
 	while (std::chrono::steady_clock::now() - beginTime < TIME_PER_ACTION && candidates.size() > 0) {
-		//for (const auto& candidate : candidates)
-		//	assert(candidate.node->info.board.data[127] == 0);
+		for (const auto& candidate : candidates)
+			assert(candidate.node->info.board.data[127] == 0);
 		auto* best = sortBest();
-		//for (auto& candidate : candidates)
-		//	assert(best != candidate.node);
+		for (auto& candidate : candidates)
+			assert(best != candidate.node);
 		uint64_t startSize = candidates.size();
 		best->explore(candidates);
 
-		//for (const auto& candidate : candidates)
-		//	assert(candidate.node->info.board.data[127] == 0);
+		for (const auto& candidate : candidates)
+			assert(candidate.node->info.board.data[127] == 0);
 		cycles += candidates.size() - startSize;
 	}
 
@@ -98,10 +95,6 @@ unsigned long findBestMove(const Board& board) {
 	}
 	uint64_t s = bestCandidate->score >> 32;
 	std::cout << "move rating: " << *(float*)&s << std::endl;
-
-	lowestBest = lowestBest >> 32;
-	highestTrimmed = highestTrimmed >> 32;
-	std::cout << "[TRIM] lowest best: " << *(float*)&lowestBest << ", highest trimmed: " << *(float*)&highestTrimmed << std::endl;
-
+	
 	return bestCandidate->score & 0xffffffff;
 }

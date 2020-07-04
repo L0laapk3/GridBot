@@ -1,7 +1,6 @@
 #pragma once
 
-#include <queue>
-#include <deque>
+#include <vector>
 
 #include "Board.h"
 
@@ -15,6 +14,6 @@ struct Candidate {
 };
 
 // seems to be faster than manual sorting for > ~.5 sec computation time. better scaling. no worrying about deleting relevant parts of Candidates.
-typedef std::priority_queue<Candidate, std::deque<Candidate>, std::greater<Candidate>> Candidates;
+typedef std::vector<Candidate> Candidates;
 
 unsigned long findBestMove(const Board& board);
