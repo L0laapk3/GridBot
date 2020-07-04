@@ -1,6 +1,6 @@
 #pragma once
 
-#include <queue>
+#include <span>
 
 #include "Board.h"
 #include "Explore.h"
@@ -13,7 +13,7 @@ class ExploreNode {
 		~ExploreNode();
 
 		// once explore is called, the union will switch, it will have a bunch of child nodes, afterwards computeScore OR cleanup have to be called.
-		void explore(Candidates& candidates);
+		std::span<ExploreNode> explore();
 
 		void computeScore();
 		void cleanUp();

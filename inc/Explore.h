@@ -4,6 +4,8 @@
 
 #include "Board.h"
 
+constexpr auto MS_PER_ACTION = 1000;
+constexpr auto RESERVE_SIZE = 300 * MS_PER_ACTION;
 
 class ExploreNode;
 struct Candidate {
