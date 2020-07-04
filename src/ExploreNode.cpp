@@ -15,7 +15,7 @@ ExploreNode::ExploreNode(const Board& board, const unsigned long& move) {
 }
 
 
-void ExploreNode::explore(std::vector<Candidate>& candidates) {
+void ExploreNode::explore(Candidates& candidates) {
 	// will use the consumed wildcards in the lower 32 bits of prevScore
 #ifndef NDEBUG
 	assert(info.board.data[127] == 0 && info.board.data[126] == 0 && info.board.data[125] == 0);
@@ -35,10 +35,10 @@ void ExploreNode::explore(std::vector<Candidate>& candidates) {
 
 	for (ExploreNode& node : childNodes) {
 		assert(node.info.board.data[127] == 0);
-		candidates.push_back(Candidate{ node.score, &node });
+		candidates.push(Candidate{ node.score, &node });
 	}
-	for (const auto& candidate : candidates)
-		assert(candidate.node->info.board.data[127] == 0);
+	//for (const auto& candidate : candidates)
+	//	assert(candidate.node->info.board.data[127] == 0);
 
 	//std::cout << std::bitset<25>(availableWildcards) << std::endl;
 	info.childNodes = {
@@ -47,14 +47,14 @@ void ExploreNode::explore(std::vector<Candidate>& candidates) {
 	};
 
 
-	for (const auto& candidate : candidates)
-		assert(candidate.node->info.board.data[127] == 0);
+	//for (const auto& candidate : candidates)
+	//	assert(candidate.node->info.board.data[127] == 0);
 
 	info.board.data[127] = 1;
 
 
-	for (const auto& candidate : candidates)
-		assert(this != candidate.node);
+	//for (const auto& candidate : candidates)
+	//	assert(this != candidate.node);
 
 	// shitty hack to steal ownership of the now array on the heap.
 	new (&childNodes) std::vector<ExploreNode>; 

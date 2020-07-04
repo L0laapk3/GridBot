@@ -1,15 +1,10 @@
 #pragma once
 
-#include <vector>
+#include <queue>
 
 #include "Board.h"
+#include "Explore.h"
 
-
-class ExploreNode;
-struct Candidate {
-	uint64_t score;
-	ExploreNode* node;
-};
 
 class ExploreNode {
 	public:
@@ -18,7 +13,7 @@ class ExploreNode {
 		~ExploreNode();
 
 		// once explore is called, the union will switch, it will have a bunch of child nodes, afterwards computeScore OR cleanup have to be called.
-		void explore(std::vector<Candidate>& candidates);
+		void explore(Candidates& candidates);
 
 		void computeScore();
 		void cleanUp();
