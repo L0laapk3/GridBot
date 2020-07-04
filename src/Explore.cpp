@@ -8,7 +8,7 @@
 #include <cassert>
 
 
-constexpr size_t TRIM_SIZE = 1 << 13;
+constexpr size_t TRIM_SIZE = 1 << 16;
 constexpr auto TIME_PER_ACTION = std::chrono::milliseconds(1000);
 
 
