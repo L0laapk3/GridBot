@@ -93,23 +93,23 @@ void ExploreNode::computeScore() {
 		it->~ExploreNode();
 		float chance = remainderChance;
 		if (consumedWildcards) {
-			std::cout << std::bitset<25>(consumedWildcards) << std::endl;
+			//std::cout << std::bitset<25>(consumedWildcards) << std::endl;
 			if (consumedWildcards & ~wildcardsLeft[wildcardValue]) // check if a wildcard is used that is no longer available.
 				continue;
 			std::array<unsigned long, 2> wildcardCopies = { wildcardsLeft[wildcardValue == 0 ? 1 : 0], wildcardsLeft[wildcardValue == 2 ? 1 : 2] };
 			for (int i = 0; i < 25; i++) {
-				std::cout << i << std::endl << std::bitset<25>(wildcards) << std::endl << std::bitset<25>(consumedWildcards) << std::endl << std::endl << std::bitset<25>(wildcardCopies[0]) << std::endl << std::bitset<25>(wildcardCopies[1]) << std::endl << std::endl;
+				//std::cout << i << std::endl << std::bitset<25>(wildcards) << std::endl << std::bitset<25>(consumedWildcards) << std::endl << std::endl << std::bitset<25>(wildcardCopies[0]) << std::endl << std::bitset<25>(wildcardCopies[1]) << std::endl << std::endl;
 
 				//std::cout << i << " " << consumedWildcards << std::endl;
 				if (consumedWildcards & 0b1) {
-					std::cout << chance << " " << (wildcardCopies[0] & 0b1) << (wildcardCopies[1] & 0b1) << std::endl;
+					//std::cout << chance << " " << (wildcardCopies[0] & 0b1) << (wildcardCopies[1] & 0b1) << std::endl;
 					chance /= (1.f + (wildcardCopies[0] & 0b1) + (wildcardCopies[1] & 0b1));
 				}
 				consumedWildcards >>= 1;
 				wildcardCopies[0] >>= 1;
 				wildcardCopies[1] >>= 1;
 			}
-			std::cout << "subscore " << subScore << " " << chance << std::endl;
+			//std::cout << "subscore " << subScore << " " << chance << std::endl;
 		}
 
 		if (chance == remainderChance) {

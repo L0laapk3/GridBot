@@ -8,7 +8,7 @@
 #include <cassert>
 
 
-constexpr size_t TRIM_SIZE = 1 << 12;
+constexpr size_t TRIM_SIZE = 1 << 13;
 constexpr auto TIME_PER_ACTION = std::chrono::milliseconds(1000);
 
 
@@ -103,14 +103,14 @@ unsigned long findBestMove(const Board& board) {
 
 	for (auto& node : topLevelMoves) {
 		uint64_t s = node.score >> 32;
-		std::cout << "score " << *(float*)&(s) << std::endl;
+		//std::cout << "score " << *(float*)&(s) << std::endl;
 	}
 	uint64_t s = bestCandidate->score >> 32;
 	std::cout << "move rating: " << *(float*)&s << std::endl;
 
 	lowestBest = lowestBest >> 32;
 	highestTrimmed = highestTrimmed >> 32;
-	std::cout << "lowest best: " << *(float*)&lowestBest << ", highest trimmed: " << *(float*)&highestTrimmed << std::endl;
+	std::cout << "[TRIM] lowest best: " << *(float*)&lowestBest << ", highest trimmed: " << *(float*)&highestTrimmed << std::endl;
 
 	return bestCandidate->score & 0xffffffff;
 }

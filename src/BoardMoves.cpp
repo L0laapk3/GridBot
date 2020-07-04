@@ -9,11 +9,11 @@
 
 
 // only care about moves that contain MAXRAND or less wildcard cells.
-constexpr int MAXRAND = 8;
+constexpr int MAXRAND = 0;
 
 
 void Board::iterateMoves(MoveFunc cb) const {
-	//std::cout << std::endl;
+	//std::cout << "exploring.." << std::endl;
 	//print();
 	auto foundMove = [&](const int& first, const int& second, const int& length, const Data& oldValue, const Move& cells, const int& cellShift, const int& numWildcards) {
 		if (oldValue[4] == 0b1 && (length == 3 || length == 6))
@@ -73,6 +73,7 @@ void Board::iterateMoves(MoveFunc cb) const {
 
 	constexpr auto randomGrid = repeat(0x0f);
 	Data randomMask = maskedCompareToMask(data, randomGrid);
+	Data d123Mask = maskedCompareToMask(data, repeat(0x11)) | maskedCompareToMask(data, repeat(0x01)) | maskedCompareToMask(data, repeat(0x02));
 
 	std::function<void(std::array<Data, MAXRAND+1>&, Node const*, const int&, const int&, const Move&, const int&)> exploreCombinations =
 		[&](std::array<Data, MAXRAND+1>& prevDatas, Node const* moves, const int& length, const int& end, const Move& cells, const int& cellShift) {
@@ -89,15 +90,22 @@ void Board::iterateMoves(MoveFunc cb) const {
 			const Move newCells = (direction < 0 ? cells << -direction : cells) | (1 << newCellShift);
 			bool hasAtLeastOneResult = false;
 			for (int i = 0; i <= std::min(length, MAXRAND); i++) {
+				// D123 check for randoms needed!!!
+				//std::cout << i << std::endl;
 				if (i < length) {
 					const Data shifted = direction < 0 ? prevDatas[i] >> (-5 * direction) : prevDatas[i] << (5 * direction);
-					const Data shiftedNoRandom = (shifted & ~randomMask) | prevToNextRandLevel;
+					//printRaw(shifted);
+					const Data shiftedNoRandom = (shifted & ~randomMask);
 					prevToNextRandLevel = shifted & randomMask;
-					datas[i] = shiftedNoRandom & maskedCompareToMask(shiftedNoRandom, data, mask);
+					if (i == 0)
+						prevToNextRandLevel &= direction < 0 ? d123Mask >> (-5 * direction) : d123Mask << (5 * direction);
+					datas[i] = shiftedNoRandom & (toMask(andBits(shiftedNoRandom == data)) | prevToNextRandLevel & mask);
 				} else {
 					//std::cout << "moves consisting of only wildcards" << std::endl;
-					datas[i] = repeat(0x0f) & maskedCompareToMask(prevToNextRandLevel, data, mask);
+					datas[i] = prevToNextRandLevel & mask;
 				}
+				//printRaw(datas[i]);
+				//std::cout << "printing prevToNextRandLevel" << std::endl;
 				//printRaw(prevToNextRandLevel);
 
 				if (datas[i].any()) {
@@ -123,7 +131,10 @@ void Board::iterateMoves(MoveFunc cb) const {
 	std::array<Data, MAXRAND+1> datas;
 	datas[0] = data & ~randomMask;
 	if (MAXRAND >= 1)
-		datas[1] = randomMask;
+		datas[1] = randomGrid & randomMask;
+	//printRaw(datas[0]);
+	//printRaw(datas[1]);
+
 	for (int i = 2; i <= MAXRAND; i++)
 		datas[i] = Data(0);
 	exploreCombinations(datas, &ALLMOVES, 2, 0, 0b1, 0);

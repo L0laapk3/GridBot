@@ -66,9 +66,12 @@ constexpr Data maskedCompare(Data const& a, Data const& b, Data const& mask = re
 	return cumul;
 }
 
+constexpr Data toMask(Data const& a) {
+	return a | a << 1 | a << 2 | a << 3 | a << 4;
+}
+
 constexpr Data maskedCompareToMask(Data const& a, Data const& b, Data const& mask = repeat(0x01)) {
-	const Data cumul = maskedCompare(a, b, mask);
-	return cumul | cumul << 1 | cumul << 2 | cumul << 3 | cumul << 4;
+	return toMask(maskedCompare(a, b, mask));
 }
 
 const Data expand(const Move& move, const unsigned int& valueInt = 0b11111);
