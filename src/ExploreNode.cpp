@@ -86,8 +86,9 @@ void ExploreNode::computeScore() {
 		std::partial_sort(it, it + 1, end, [](const ExploreNode& a, const ExploreNode& b) { return a.score > b.score; });
 
 		unsigned long consumedWildcards = it->score & wildcards;
-		//std::cout << std::bitset<25>(it->score) << " " << std::bitset<25>(~it->score & wildcards) << " " << std::bitset<25>(consumedWildcards) << std::endl;
+		//std::cout << std::bitset<25>(wildcardsLeft[0]) << " " << std::bitset<25>(wildcardsLeft[1]) << " " << std::bitset<25>(wildcardsLeft[2]) << " " << std::endl;
 		const unsigned short wildcardValue = (it->score >> 30) & 0x3;	// 00 = 2, 01 = 1, 10 = 3
+		assert(wildcardValue < 3);
 		uint32_t scoreInt = it->score >> 32;
 		float& subScore = *(float*)(&scoreInt);
 		it->~ExploreNode();
@@ -100,7 +101,6 @@ void ExploreNode::computeScore() {
 			for (int i = 0; i < 25; i++) {
 				//std::cout << i << std::endl << std::bitset<25>(wildcards) << std::endl << std::bitset<25>(consumedWildcards) << std::endl << std::endl << std::bitset<25>(wildcardCopies[0]) << std::endl << std::bitset<25>(wildcardCopies[1]) << std::endl << std::endl;
 
-				//std::cout << i << " " << consumedWildcards << std::endl;
 				if (consumedWildcards & 0b1) {
 					//std::cout << chance << " " << (wildcardCopies[0] & 0b1) << (wildcardCopies[1] & 0b1) << std::endl;
 					chance /= (1.f + (wildcardCopies[0] & 0b1) + (wildcardCopies[1] & 0b1));
@@ -109,23 +109,26 @@ void ExploreNode::computeScore() {
 				wildcardCopies[0] >>= 1;
 				wildcardCopies[1] >>= 1;
 			}
-			//std::cout << "subscore " << subScore << " " << chance << std::endl;
-		}
-
-		if (chance == remainderChance) {
-			partialScore += subScore;
-			break;
+			//std::cout << "subscore " << subScore << " chance " << chance << " tot " << partialScore << std::endl;
 		}
 
 		partialScore += chance * subScore;
+
+		//std::cout << "tot " << partialScore << std::endl;
+		if (chance == remainderChance)
+			break;
 		remainderChance -= chance;
 
 		wildcardsLeft[wildcardValue] &= ~consumedWildcards;
+		
+		//std::cout << std::bitset<25>(wildcardsLeft[0]) << " " << std::bitset<25>(wildcardsLeft[1]) << " " << std::bitset<25>(wildcardsLeft[2]) << " " << std::endl;
+
+		
 		for (const auto& wildcard : wildcardsLeft)	// remainderChance should be 0 by now but because of inaccuracies lets just check if any wildcards are left for use instead
 			if (wildcard != 0)
-				continue; // if any are left, continue
-
+				goto cnt; // if any are left, continue
 		break;
+	cnt:;
 	}
 	// if any of the wildcard combinations are done at this point, no moves have been found so the score is zero for those (death)
 	// partialScore += remainderChance * 0;
