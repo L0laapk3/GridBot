@@ -55,6 +55,7 @@ std::span<ExploreNode> ExploreNode::explore() {
 
 
 
+static std::allocator<ExploreNode> allocator;
 
 void ExploreNode::computeScore() {
 	assert(info.board.data[126] == 0 && info.board.data[125] == 0);
@@ -85,7 +86,6 @@ void ExploreNode::computeScore() {
 		assert(wildcardValue < 3);
 		uint32_t scoreInt = it->score >> 32;
 		float& subScore = *(float*)(&scoreInt);
-		it->~ExploreNode();
 		float chance = remainderChance;
 		if (consumedWildcards) {
 			//std::cout << std::bitset<25>(consumedWildcards) << std::endl;
@@ -124,10 +124,11 @@ void ExploreNode::computeScore() {
 		break;
 	cnt:;
 	}
+
+	allocator.deallocate(info.childNodes.begin, info.childNodes.wildcards_size & 0xffffffff);
 	// if any of the wildcard combinations are done at this point, no moves have been found so the score is zero for those (death)
 	// partialScore += remainderChance * 0;
 
-	assert(partialScore < 1000);
 	score = *(uint64_t*)&partialScore << 32 | (score & 0xffffffff);
 	uint64_t s = score >> 32;
 	//std::cout << "score " << partialScore << " " << *(float*)&(s) << std::endl;
@@ -136,8 +137,7 @@ void ExploreNode::computeScore() {
 void ExploreNode::cleanUp() {
 	assert(info.board.data[126] == 0 && info.board.data[125] == 0);
 	if (info.board.data[127] == 1)
-		for (auto it = info.childNodes.begin; it < info.childNodes.begin + (info.childNodes.wildcards_size & 0xffffffff); it++)
-			it->~ExploreNode();
+		allocator.deallocate(info.childNodes.begin, info.childNodes.wildcards_size & 0xffffffff);
 #ifndef NDEBUG
 	info.board.data[126] = 1;
 #endif
