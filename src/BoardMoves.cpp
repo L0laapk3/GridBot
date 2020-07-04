@@ -9,7 +9,7 @@
 
 
 // only care about moves that contain MAXRAND or less wildcard cells.
-constexpr int MAXRAND = 0;
+constexpr int MAXRAND = 8;
 
 
 void Board::iterateMoves(MoveFunc cb) const {
@@ -19,12 +19,12 @@ void Board::iterateMoves(MoveFunc cb) const {
 		if (oldValue[4] == 0b1 && (length == 3 || length == 6))
 			return;
 		//std::cout << "found move of length " << length << ", first=" << first << ", second=" << second << ", cshift=" << cellShift << std::endl;
-		//printRaw(expand(cells));
 		assert(Bitset2::bitset2<25>(cells).count() == length);
 		const int shiftAmount = first - cellShift;
 		const Move move = shiftAmount > 0 ? cells << shiftAmount : cells >> -shiftAmount;
-		//std::cout << "numwildcards " << numWildcards << " " << std::bitset<25>(shrink(andBits((data) == repeat(0x1f)))) << " " << std::bitset<25>(move) << std::endl;
-		assert(numWildcards == Data(shrink(andBits((data) == repeat(0x1f))) & move).count());
+		//print();
+		//std::cout << "numwildcards " << numWildcards << " " << std::bitset<25>(shrink(andBits(data == repeat(0x0f)))) << " " << std::bitset<25>(move) << std::endl;
+		assert(numWildcards == Data(shrink(andBits(data == repeat(0x0f))) & move).count());
 
 		if (((oldValue & Data(0x1f)) ^ Data(0x0f)).any()) {
 			const uint64_t wildcardValue = oldValue[4] ? 2 : oldValue[0];
@@ -94,12 +94,16 @@ void Board::iterateMoves(MoveFunc cb) const {
 				//std::cout << i << std::endl;
 				if (i < length) {
 					const Data shifted = direction < 0 ? prevDatas[i] >> (-5 * direction) : prevDatas[i] << (5 * direction);
-					//printRaw(shifted);
 					const Data shiftedNoRandom = (shifted & ~randomMask);
-					prevToNextRandLevel = shifted & randomMask;
+					datas[i] = shiftedNoRandom & ((toMask(andBits(shiftedNoRandom == data) & mask) | prevToNextRandLevel));
+
+					prevToNextRandLevel = shifted & randomMask & toMask(mask);
 					if (i == 0)
 						prevToNextRandLevel &= direction < 0 ? d123Mask >> (-5 * direction) : d123Mask << (5 * direction);
-					datas[i] = shiftedNoRandom & (toMask(andBits(shiftedNoRandom == data)) | prevToNextRandLevel & mask);
+					//printRaw(shiftedNoRandom);
+					//printRaw(shiftedNoRandom == data);
+					//printRaw(andBits(shiftedNoRandom == data) & mask);
+					//printRaw(toMask(andBits(shiftedNoRandom == data) & mask));
 				} else {
 					//std::cout << "moves consisting of only wildcards" << std::endl;
 					datas[i] = prevToNextRandLevel & mask;
@@ -110,10 +114,12 @@ void Board::iterateMoves(MoveFunc cb) const {
 
 				if (datas[i].any()) {
 					if (newMoves->end) {
-						const Data finishedPath = datas[i] | datas[i] >> 1 | datas[i] >> 2 | datas[i] >> 3 | datas[i] >> 4;
-						for (int j = 0; j < 25; j++)
-							if (finishedPath[5 * j])
+						Data finishedPath = datas[i];
+						for (int j = 0; j < 25; j++) {
+							if ((finishedPath & Data(0x1f)).any())
 								foundMove(j, j + newEnd, length, (datas[i] >> (5 * j)), newCells, newCellShift, i);
+							finishedPath >>= 5;
+						}
 					}
 					hasAtLeastOneResult = true;
 				}

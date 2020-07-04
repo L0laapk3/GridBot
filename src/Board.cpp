@@ -107,7 +107,7 @@ std::vector<int> Board::decompressMove(const Move& move) const {
 	//print();
 	int pos = (move >> 25) & 0x1f;
 	const Bitset2::bitset2<25> bitboard(move & 0x1ffffff);
-	//std::cout << bitboard << std::endl;
+	//std::cout << pos << " " << bitboard << std::endl;
 	int length = bitboard.count();
 	const Data value = (data >> (5 * pos)) & Data(0x1f);
 

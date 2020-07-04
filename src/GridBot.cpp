@@ -25,7 +25,7 @@ int __cdecl main(int argc, char** argv)
 		if (false)
 			board.data = Data(std::array<uint64_t, 2>{
 				0b0101'00110'00101'00110'00101'00110'00101'00110'00101'00110'00101'00110'00101,
-					0b00010'01111'10001'00110'00101'10001'00001'00110'00101'00110'00101'00110'0
+					0b01111'01111'10001'00110'00101'10001'00001'00110'00101'00110'00101'00110'0
 			});
 
 		board.print();
@@ -33,7 +33,6 @@ int __cdecl main(int argc, char** argv)
 		const auto compressedMove = findBestMove(board);
 		if (compressedMove == 0)
 			break;
-		board.print();
 
 		const auto move = board.decompressMove(compressedMove);
 		score += move.size() * board.valueAt(5 * move[0]);
