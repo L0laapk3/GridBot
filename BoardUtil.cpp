@@ -21,8 +21,8 @@ const void printRaw(const Data& data) {
 
 const Data expand(const Move& move, const unsigned int& valueInt) {
 	return Data(std::array<uint64_t, 2>{
-		_pdep_u64(move, 0b0001000010000100001000010000100001000010000100001000010000100001)* valueInt,
-		_pdep_u64(move >> 13, 0b0000000100001000010000100001000010000100001000010000100001000010)* valueInt + ((move >> 12) & 1) * (valueInt >> 4)
+		_pdep_u64(move, 0b0001000010000100001000010000100001000010000100001000010000100001) * valueInt,
+		_pdep_u64(move >> 13, 0b0000000100001000010000100001000010000100001000010000100001000010) * valueInt + ((move >> 12) & 1) * (valueInt >> 4)
 	});
 }
 

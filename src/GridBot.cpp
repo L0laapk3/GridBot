@@ -32,6 +32,8 @@ int __cdecl main(int argc, char** argv)
 
 		std::cout << "===================================================" << std::endl;
 		std::cout << "score: " << score << std::endl;
+
+		return 1;
 	}
 
 	conn.close();

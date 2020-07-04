@@ -101,10 +101,10 @@ unsigned long findBestMove(const Board& board) {
 
 	const auto& bestCandidate = std::max_element(topLevelMoves.begin(), topLevelMoves.end(), [](const ExploreNode& a, const ExploreNode& b) { return a.score < b.score; });
 
-	//for (auto& node : topLevelMoves) {
-	//	uint64_t s = node.score >> 32;
-	//	std::cout << "score " << *(float*)&(s) << std::endl;
-	//}
+	for (auto& node : topLevelMoves) {
+		uint64_t s = node.score >> 32;
+		std::cout << "score " << *(float*)&(s) << std::endl;
+	}
 	uint64_t s = bestCandidate->score >> 32;
 	std::cout << "move rating: " << *(float*)&s << std::endl;
 

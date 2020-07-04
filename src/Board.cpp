@@ -65,6 +65,15 @@ void Board::print() const {
 
 void Board::set(const std::string& str) {
 	data.reset();
+
+	data = Data(std::array<uint64_t,2>{
+		0b0101'00110'00101'00110'00101'00110'00101'00110'00101'00110'00101'00110'00101,
+		0b00010'00010'10001'00110'00101'10001'00001'00110'00101'00110'00101'00110'0
+	});
+	return;
+
+
+
 	int i = 0;
 	int j = 1;
 	int value = 0;
