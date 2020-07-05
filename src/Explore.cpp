@@ -12,6 +12,8 @@
 
 
 
+float lastScore = -1;
+
 std::vector<int> findBestMove(const Board& board) {
 	
 	// possibly better to save score locally instead of pointer to it
@@ -76,9 +78,12 @@ std::vector<int> findBestMove(const Board& board) {
 
 	const auto& bestCandidate = std::max_element(topLevelMoves.begin(), topLevelMoves.end());
 
-	for (auto& node : topLevelMoves) {
+	for (auto& node : topLevelMoves)
 		//std::cout << "score " << node.getScore() << std::endl;
-	}
+
+	assert(lastScore != 0 || bestCandidate->getScore() == 0);
+	lastScore = bestCandidate->getScore();
+
 	std::cout << "move rating: " << bestCandidate->getScore() << std::endl;
 	//std::cout << "candidates size: " << candidates.size() << std::endl;
 	

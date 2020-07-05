@@ -78,7 +78,7 @@ void Board::iterateMoves(std::vector<ExploreNode>& childNodes) const {
 
 	constexpr auto randomGrid = repeat(0x0f);
 	const Data randomMask = maskedCompareToMask(data, randomGrid);
-	const Data d123Mask = maskedCompareToMask(data, repeat(0x11)) | maskedCompareToMask(data, repeat(0x01)) | maskedCompareToMask(data, repeat(0x02));
+	const Data d123Mask = toMask(find123(data));
 
 	std::function<void(std::array<Data, MAXRAND+1>&, Node const*, const int&, const int&, const Move&, const int&)> exploreCombinations =
 		[&](std::array<Data, MAXRAND+1>& prevDatas, Node const* moves, const int& length, const int& end, const Move& cells, const int& cellShift) {
@@ -95,16 +95,19 @@ void Board::iterateMoves(std::vector<ExploreNode>& childNodes) const {
 			const Move newCells = (direction < 0 ? cells << -direction : cells) | (1 << newCellShift);
 			bool hasAtLeastOneResult = false;
 			for (int i = 0; i <= std::min(length, MAXRAND); i++) {
-				// D123 check for randoms needed!!!
-				//std::cout << i << std::endl;
+				//std::cout << i << " " << length << std::endl;
 				if (i < length) {
 					const Data shifted = direction < 0 ? prevDatas[i] >> (-5 * direction) : prevDatas[i] << (5 * direction);
 					const Data shiftedNoRandom = (shifted & ~randomMask);
-					datas[i] = shiftedNoRandom & ((toMask(andBits(shiftedNoRandom == data) & mask) | prevToNextRandLevel));
+					if (i + 1 < length)
+						datas[i] = shiftedNoRandom & ((toMask(andBits(shiftedNoRandom == data) & mask) | prevToNextRandLevel));
+					else // all were randoms except this one
+						datas[i] = data & d123Mask & (shiftedNoRandom | shiftedNoRandom << 1) | (prevToNextRandLevel & toMask(find123(prevToNextRandLevel)));
 
 					prevToNextRandLevel = shifted & randomMask & toMask(mask);
-					if (i == 0)
-						prevToNextRandLevel &= direction < 0 ? d123Mask >> (-5 * direction) : d123Mask << (5 * direction);
+					//if (i == 0)
+					//	prevToNextRandLevel &= direction < 0 ? d123Mask >> (-5 * direction) : d123Mask << (5 * direction);
+
 					//printRaw(shiftedNoRandom);
 					//printRaw(shiftedNoRandom == data);
 					//printRaw(andBits(shiftedNoRandom == data) & mask);

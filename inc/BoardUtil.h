@@ -98,6 +98,10 @@ constexpr Data toMask(Data const& a) {
 	return a | a << 1 | a << 2 | a << 3 | a << 4;
 }
 
+constexpr Data find123(Data const& data) {
+	return maskedCompare(data, repeat(0x01)) | maskedCompare(data, repeat(0x02)) | maskedCompare(data, repeat(0x11));
+}
+
 constexpr Data maskedCompareToMask(Data const& a, Data const& b, Data const& mask = repeat(0x01)) {
 	return toMask(maskedCompare(a, b, mask));
 }
