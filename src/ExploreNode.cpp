@@ -74,15 +74,14 @@ void ExploreNode::computeScore() {
 
 	float partialScore = 0.f;
 	float remainderChance = 1.f;
+
 	for (auto it = info.childNodes.begin; it < end; it++) {
-		std::partial_sort(it, it + 1, end, [](const ExploreNode& a, const ExploreNode& b) { return a.score > b.score; });
+		std::partial_sort(it, it + 1, end, std::greater<ExploreNode>());
 
 		unsigned long consumedWildcards = it->score & wildcards;
 		//std::cout << std::bitset<25>(wildcardsLeft[0]) << " " << std::bitset<25>(wildcardsLeft[1]) << " " << std::bitset<25>(wildcardsLeft[2]) << " " << std::endl;
 		const unsigned short wildcardValue = (it->score >> 30) & 0x3;	// 00 = 2, 01 = 1, 10 = 3
 		assert(wildcardValue < 3);
-		uint32_t scoreInt = it->score >> 32;
-		float& subScore = *(float*)(&scoreInt);
 		float chance = remainderChance;
 		if (consumedWildcards) {
 			//std::cout << std::bitset<25>(consumedWildcards) << std::endl;
@@ -103,7 +102,7 @@ void ExploreNode::computeScore() {
 			//std::cout << "subscore " << subScore << " chance " << chance << " tot " << partialScore << std::endl;
 		}
 
-		partialScore += chance * subScore;
+		partialScore += chance * it->getScore();
 
 		//std::cout << "tot " << partialScore << std::endl;
 		if (chance == remainderChance)

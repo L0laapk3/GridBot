@@ -38,7 +38,7 @@ unsigned long findBestMove(const Board& board) {
 		for (const auto& candidate : candidates)
 			assert(candidate.node->info.board.data[127] == 0);
 		
-		const auto it = bestIndex != 0 ? candidates.begin() + bestIndex : std::max_element(candidates.begin(), candidates.end(), [](const Candidate& a, const Candidate& b) { return a.score < b.score; });
+		const auto it = bestIndex != 0 ? candidates.begin() + bestIndex : std::max_element(candidates.begin(), candidates.end());
 		Candidate best = *it;
 		candidates.erase(it);
 
@@ -50,7 +50,7 @@ unsigned long findBestMove(const Board& board) {
 		bestIndex = 0;
 		for (ExploreNode& node : childNodes) {
 			assert(node.info.board.data[127] == 0);
-			if (node.score > best.score) {
+			if (node > best) {
 				best.score = node.score;
 				bestIndex = candidates.size();
 			}
@@ -74,14 +74,12 @@ unsigned long findBestMove(const Board& board) {
 	for (auto& node : topLevelMoves)
 		node.computeScore();
 
-	const auto& bestCandidate = std::max_element(topLevelMoves.begin(), topLevelMoves.end(), [](const ExploreNode& a, const ExploreNode& b) { return a.score < b.score; });
+	const auto& bestCandidate = std::max_element(topLevelMoves.begin(), topLevelMoves.end());
 
 	for (auto& node : topLevelMoves) {
-		uint64_t s = node.score >> 32;
-		//std::cout << "score " << *(float*)&(s) << std::endl;
+		//std::cout << "score " << node.getScore() << std::endl;
 	}
-	uint64_t s = bestCandidate->score >> 32;
-	std::cout << "move rating: " << *(float*)&s << std::endl;
+	std::cout << "move rating: " << bestCandidate->getScore() << std::endl;
 	std::cout << "candidates size: " << candidates.size() << std::endl;
 	
 	return bestCandidate->score & 0xffffffff;

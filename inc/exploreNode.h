@@ -2,11 +2,12 @@
 
 #include <span>
 
+#include "ScoreSortable.h"
 #include "Board.h"
 #include "Explore.h"
 
 
-class ExploreNode {
+class ExploreNode : public ScoreSortable {
 	public:
 		ExploreNode(const ExploreNode& exploreNode) = default;
 		ExploreNode(const Board& board, const unsigned long& move);
@@ -18,7 +19,7 @@ class ExploreNode {
 		void computeScore();
 		void cleanUp();
 
-		uint64_t score; // upper 32 bits score, lower: 2b used wildcard value | 5b end cell location | 25b bitboard with moved cells
+		//uint64_t score: upper 32 bits score, lower: 2b used wildcard value | 5b end cell location | 25b bitboard with moved cells
 		union Info {
 			Board board;
 			struct childNodes {

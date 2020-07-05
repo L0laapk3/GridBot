@@ -3,16 +3,14 @@
 #include <vector>
 
 #include "Board.h"
+#include "ScoreSortable.h"
 
 constexpr auto MS_PER_ACTION = 1000;
 constexpr auto RESERVE_SIZE = 300 * MS_PER_ACTION;
 
 class ExploreNode;
-struct Candidate {
-	uint64_t score;
+struct Candidate : public ScoreSortable {
 	ExploreNode* node;
-	bool operator<(const Candidate& other) const { return score < other.score; };
-	bool operator>(const Candidate& other) const { return score > other.score; };
 };
 
 // seems to be faster than manual sorting for > ~.5 sec computation time. better scaling. no worrying about deleting relevant parts of Candidates.
