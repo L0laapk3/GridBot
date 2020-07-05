@@ -12,7 +12,7 @@
 
 
 
-unsigned long findBestMove(const Board& board) {
+std::vector<int> findBestMove(const Board& board) {
 	
 	// possibly better to save score locally instead of pointer to it
 	Candidates candidates{};
@@ -69,7 +69,7 @@ unsigned long findBestMove(const Board& board) {
 	std::cout << "explored " << cycles << " boards. " << std::endl;
 
 	if (topLevelMoves.size() <= 0)
-		return 0;
+		return std::vector<int>();
 
 	for (auto& node : topLevelMoves)
 		node.computeScore();
@@ -80,7 +80,7 @@ unsigned long findBestMove(const Board& board) {
 		//std::cout << "score " << node.getScore() << std::endl;
 	}
 	std::cout << "move rating: " << bestCandidate->getScore() << std::endl;
-	std::cout << "candidates size: " << candidates.size() << std::endl;
+	//std::cout << "candidates size: " << candidates.size() << std::endl;
 	
-	return bestCandidate->score & 0xffffffff;
+	return board.decompressMove(bestCandidate->score & 0xffffffff);
 }

@@ -120,6 +120,9 @@ const float Board::eval() const {
 
 	//std::cout << (hasThree & repeat(0x1)).count() << " " << (hasThree & repeat(0x2)).count() << " " << (hasThree & repeat(0x4)).count() << " " << (hasThree & repeat(0x8)).count() << std::endl;
 
+	//print();
+	//printRaw(hasThree);
+
 	const float scoreThrees = (hasThree & repeat(0x1)).count()
 		+ (hasThree & repeat(0x2)).count() * 2*2
 		+ (hasThree & repeat(0x4)).count() * 4*4
@@ -127,5 +130,5 @@ const float Board::eval() const {
 
 
 
-	return 4 * scoreSurvivability + scoreThrees;// +scoreWeighted / 8;// +4 * scoreContinuity;
+	return 6 * scoreSurvivability + scoreThrees;// +scoreWeighted / 8;// +4 * scoreContinuity;
 }

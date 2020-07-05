@@ -33,11 +33,10 @@ int __cdecl main(int argc, char** argv)
 
 		board.print();
 
-		const auto compressedMove = findBestMove(board);
-		if (compressedMove == 0)
+		const auto move = findBestMove(board);
+		if (move.size() == 0)
 			break;
 
-		const auto move = board.decompressMove(compressedMove);
 		score += move.size() * board.valueAt(5 * move[0]);
 		conn.sendMove(move);
 
