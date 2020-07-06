@@ -25,9 +25,9 @@ void foundMove(MoveFunc& cb, const Data& data, const int& first, const int& seco
 	assert(numWildcards == Data(shrink(andBits(data == repeat(0x0f))) & move).count());
 
 	if (((oldValue & Data(0x1f)) ^ Data(0x0f)).any()) {
-		const unsigned long wildcardValue = oldValue[4] ? 2 : oldValue[0];
 		const Data shiftedCells = expand(move);
 		short n = (short)(oldValue & Data(0x0f)).to_ulong();
+		unsigned long usedValue = 1 << (n - 1);
 		int l = length;
 		while ((l & 0b1) == 0b0) {
 			assert(l != 0);
@@ -39,6 +39,7 @@ void foundMove(MoveFunc& cb, const Data& data, const int& first, const int& seco
 		if (l == 3) {
 			assert(oldValue[4] == 0b0);
 			newCell[4] = 1;
+			usedValue *= 3;
 		}
 		else
 			newCell[4] = oldValue[4];
@@ -49,20 +50,20 @@ void foundMove(MoveFunc& cb, const Data& data, const int& first, const int& seco
 		//board2.print();
 		//std::cout << std::bitset<25>(move) << " " << std::bitset<25>(cells) << std::endl;
 		assert((Bitset2::bitset2<25>(move).count()) == length);
-		cb(board1, move, wildcardValue, first); // lowest 25 bits are bitboard, next 5 bits are end position, last 2 bits are old cell value
-		cb(board2, move, wildcardValue, second);
+		cb(board1, move, usedValue, first, length); // lowest 25 bits are bitboard, next 5 bits are end position, last 2 bits are old cell value
+		cb(board2, move, usedValue, second, length);
 	}
 	else {
 		//std::cout << "one with only wildcards" << std::endl;
-		for (unsigned long wildcardValue = 0; wildcardValue < 3; wildcardValue++) {
-			const auto& value = std::array<int, 3>{ 0x01, 0x02, 0x10 }[wildcardValue];
+		for (unsigned long usedValue = 0; usedValue < 3; usedValue++) {
+			const auto& value = std::array<int, 3>{ 0x01, 0x02, 0x10 }[usedValue];
 			const Data shiftedCells = expand(move);
 			auto newCell = Data(value);
 			const Board board1 = Board(data & ~shiftedCells | (shiftedCells & ~cell(0b11111, 5 * first) & repeat(0b01111)) | newCell << (5 * first));
 			const Board board2 = Board(data & ~shiftedCells | (shiftedCells & ~cell(0b11111, 5 * second) & repeat(0b01111)) | newCell << (5 * second));
 			assert((Bitset2::bitset2<25>(move).count()) == length);
-			cb(board1, move, wildcardValue, first);
-			cb(board2, move, wildcardValue, second);
+			cb(board1, move, usedValue, first, length);
+			cb(board2, move, usedValue, second, length);
 		}
 	}
 }

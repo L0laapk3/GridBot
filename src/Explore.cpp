@@ -15,10 +15,10 @@
 
 
 
-const float computeScore(const Board& board, const unsigned long& depth, size_t& count) {
+const float computeScore(const Board& board, const unsigned long& depth, size_t& count, const float& moveScore = 0) {
 	++count;
 	if (depth == 0)
-		return board.eval();
+		return board.eval(moveScore);
 
 
 	struct Child {
@@ -31,12 +31,12 @@ const float computeScore(const Board& board, const unsigned long& depth, size_t&
 	const uint64_t wildcards = shrink(andBits(board.data == repeat(0x0f)));
 
 	std::vector<Child> children;
-	board.iterateMoves([&](const Board& board, const unsigned long& move, const unsigned long& wildcardValue, const unsigned long& endPos) {
+	board.iterateMoves([&](const Board& board, const unsigned long& move, const unsigned long& usedValue, const unsigned long& endPos, const unsigned long& length) {
 		children.push_back({
-			computeScore(board, depth - 1, count),
+			computeScore(board, depth - 1, count, moveScore + usedValue * length),
 			board,
 			move & wildcards,
-			wildcardValue
+			usedValue
 			});
 		});
 
@@ -105,7 +105,7 @@ std::vector<unsigned long> findBestMove(const Board& board, long timeBudget) {
 		bestAction = { 0, 0 };
 
 		std::vector<Action> Actions;
-		board.iterateMoves([&](const Board& board, const unsigned long& move, const unsigned long& wildcardValue, const unsigned long& endPos) {
+		board.iterateMoves([&](const Board& board, const unsigned long& move, const unsigned long& usedValue, const unsigned long& endPos, const unsigned long& length) {
 			++count;
 			const float score = computeScore(board, depth, count);
 			Actions.push_back({ score, move, endPos });
@@ -117,14 +117,14 @@ std::vector<unsigned long> findBestMove(const Board& board, long timeBudget) {
 		const float ratio = ((float)count / lastCount);
 		const unsigned long ms = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - beginTime).count();
 		if (count == 0) {
-			std::cout << "game over" << std::endl;
+			//std::cout << "game over" << std::endl;
 			return std::vector<unsigned long>();
 		}
 		if (count == lastCount && depth > 1) {
-			std::cout << "out of options, terminated search early" << std::endl;
+			//std::cout << "out of options, terminated search early" << std::endl;
 			break;
 		}
-		std::cout << "depth " << ++depth << ": ratio " << (float)(int)(ratio*10)/10 << " in " << ms << "ms. (size " << count << ")" << std::endl;
+		std::cout << "depth " << ++depth << ": ratio " << (float)(int)(ratio*10)/10 << " in " << ms << "ms. (explored " << count << ")" << std::endl;
 		lastCount = count;
 		timeBudget -= ms * ratio;
 		if (timeBudget < 0)

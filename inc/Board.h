@@ -14,7 +14,7 @@ typedef Bitset2::bitset2<128> Data;
 
 
 class Board;
-typedef std::function<void(const Board&, const unsigned long& move, const unsigned long& wildcardValue, const unsigned long endPosition)> MoveFunc;
+typedef std::function<void(const Board&, const unsigned long&, const unsigned long&, const unsigned long&, const unsigned long&)> MoveFunc;
 
 
 class ExploreNode;
@@ -34,7 +34,7 @@ public:
 
 	std::vector<unsigned long> decompressMove(const unsigned long& move, const unsigned long& endPos) const;
 
-	const float eval() const;
+	const float eval(const float& moveScore) const;
 
 
 	Data data = Data(0);

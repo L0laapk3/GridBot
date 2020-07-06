@@ -12,7 +12,7 @@ constexpr std::array<float, 25> ALTMAP3{ 20, 15, 10, 5, 0, 21, 16, 11, 6, 1, 22,
 
 
 // basic eval that counts how many connections each cell has
-const float Board::eval() const {
+const float Board::eval(const float& moveScore) const {
 
 	float scoreSurvivability = 0;
 
@@ -130,5 +130,5 @@ const float Board::eval() const {
 
 
 
-	return 1000 * scoreSurvivability + scoreWeighted + 100 * scoreThrees;// +scoreThrees;// +scoreWeighted / 8;// +4 * scoreContinuity;
+	return scoreSurvivability;//1000 * scoreSurvivability + scoreWeighted + 100 * scoreThrees;// +scoreThrees;// +scoreWeighted / 8;// +4 * scoreContinuity;
 }
