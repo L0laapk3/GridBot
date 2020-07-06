@@ -15,9 +15,7 @@
 float lastScore = -1;
 
 std::vector<int> findBestMove(const Board& board) {
-	
-	// possibly better to save score locally instead of pointer to it
-	Candidates candidates{};
+
 
 	auto beginTime = std::chrono::steady_clock::now();
 
@@ -25,7 +23,7 @@ std::vector<int> findBestMove(const Board& board) {
 	board.iterateMoves(topLevelMoves);
 	// no more modifications to topLevelMoves after this point (pointers matter)
 
-	if (1) {
+	if (0) {
 		std::sort(topLevelMoves.begin(), topLevelMoves.end(), std::greater<ExploreNode>());
 
 		for (auto& node : topLevelMoves) {
@@ -39,48 +37,36 @@ std::vector<int> findBestMove(const Board& board) {
 
 
 	for (auto& node : topLevelMoves) {
-		candidates.push_back(Candidate{ node.score, &node });
 		assert(candidates.back().node->info.board.data[127] == 0);
 	}
-	for (const auto& candidate : candidates)
-		assert(candidate.node->info.board.data[127] == 0);
 
-	uint64_t cycles = candidates.size();
+	std::queue<std::span<ExploreNode>> queue;
+	queue.push(std::span<ExploreNode>(topLevelMoves));
 
-	size_t bestIndex = 0;
-	while (std::chrono::steady_clock::now() - beginTime < std::chrono::milliseconds{MS_PER_ACTION}  && candidates.size() > 0) {
-		for (const auto& candidate : candidates)
-			assert(candidate.node->info.board.data[127] == 0);
-		
-		const auto it = bestIndex != 0 ? candidates.begin() + bestIndex : std::max_element(candidates.begin(), candidates.end());
-		Candidate best = *it;
-		candidates.erase(it);
+	std::cout << "depth 1 : size " << topLevelMoves.size() << std::endl;
+	size_t depth = 1;
 
-		for (auto& candidate : candidates)
-			assert(best.node != candidate.node);
-		const auto& childNodes = best.node->explore();
-
-		cycles += childNodes.size();
-		bestIndex = 0;
-		for (ExploreNode& node : childNodes) {
-			assert(node.info.board.data[127] == 0);
-			if (node > best) {
-				best.score = node.score;
-				bestIndex = candidates.size();
+	while (std::chrono::steady_clock::now() - beginTime < std::chrono::milliseconds{MS_PER_ACTION}) {
+		size_t size = 0;
+		size_t remaining = queue.size();
+		while (remaining-- > 0) {
+			for (ExploreNode& node : queue.front()) {
+				const std::span<ExploreNode>& childNodes = node.explore();
+				queue.push(childNodes);
+				size += childNodes.size();
 			}
-			candidates.push_back(Candidate{ node.score, &node });
+			queue.pop();
 		}
 
-
-		for (const auto& candidate : candidates)
-			assert(candidate.node->info.board.data[127] == 0);
+		std::cout << "depth " << ++depth << " : size " << size << std::endl;
+		if (size == 0) {
+			std::cout << "out of options, terminated search early" << std::endl;
+			break;
+		}
 	}
 
+	std::cout << "took " << std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - beginTime).count() << "ms." << std::endl;
 
-	if (candidates.size() == 0)
-		std::cout << "out of options, terminated search early" << std::endl;
-
-	std::cout << "explored " << cycles << " boards. " << std::endl;
 
 	if (topLevelMoves.size() <= 0)
 		return std::vector<int>();
@@ -88,7 +74,7 @@ std::vector<int> findBestMove(const Board& board) {
 	for (auto& node : topLevelMoves)
 		node.computeScore();
 
-	if (1) {
+	if (0) {
 		std::sort(topLevelMoves.begin(), topLevelMoves.end(), std::greater<ExploreNode>());
 
 		for (auto& node : topLevelMoves) {

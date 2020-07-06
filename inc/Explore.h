@@ -13,7 +13,4 @@ struct Candidate : public ScoreSortable {
 	ExploreNode* node;
 };
 
-// seems to be faster than manual sorting for > ~.5 sec computation time. better scaling. no worrying about deleting relevant parts of Candidates.
-typedef std::vector<Candidate> Candidates;
-
 std::vector<int> findBestMove(const Board& board);
