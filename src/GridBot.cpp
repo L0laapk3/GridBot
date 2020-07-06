@@ -1,5 +1,6 @@
 
 #include <iostream>
+#include <chrono>
 
 #include "Conn.h"
 #include "Board.h"
@@ -18,11 +19,13 @@ int __cdecl main(int argc, char** argv)
 {
 	while (true) {
 		Conn conn("L0lBot");
+		const auto beginTime = std::chrono::steady_clock::now();
 
-		int score = 0;
+		unsigned long score = 0;
+		unsigned long moves = 0;
+		long timeBudget = 10000;
 		while (true) {
 			conn.receiveBoard(board);
-
 
 
 			if (0) {
@@ -48,23 +51,27 @@ int __cdecl main(int argc, char** argv)
 				return 0;
 			}
 
-			board.print();
+			//board.print();
 
-			const auto move = findBestMove(board);
+			const auto move = findBestMove(board, timeBudget);
 			if (move.size() == 0)
 				break;
 
-			score += move.size() * board.valueAt(5 * move[0]);
+			unsigned long scoreIncrease = move.size() * board.valueAt(5 * move[0]);
+			score += scoreIncrease;
+			timeBudget += 8 * scoreIncrease;
 			conn.sendMove(move);
+			++moves;
 
-			std::cout << "===================================================" << std::endl;
-			std::cout << "score: " << score << std::endl;
+			//std::cout << "score: " << score << std::endl;
+			//std::cout << "===================================================" << std::endl;
 
 			//return 0;
 		}
+		std::cout << "score: " << score << " in " << moves << " moves, " << (float)(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - beginTime).count() / 100)/10 << " seconds" << std::endl;
 
 		conn.close();
 
-		return 0;
+		//return 0;
 	}
 }

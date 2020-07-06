@@ -139,6 +139,6 @@ void Conn::sendMove(const std::vector<int> move) {
         s += "," + std::to_string(move[i]);
     }
     s += "]\n";
-    std::cout << s;
+    //std::cout << s;
     sendData(s);
 }

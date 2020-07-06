@@ -130,5 +130,5 @@ const float Board::eval() const {
 
 
 
-	return scoreSurvivability;// +scoreThrees / 8.f;// +scoreWeighted / 8;// +4 * scoreContinuity;
+	return scoreSurvivability;// +scoreThrees;// +scoreWeighted / 8;// +4 * scoreContinuity;
 }

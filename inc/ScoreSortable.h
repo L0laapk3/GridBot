@@ -13,6 +13,6 @@ public:
 		return *(float*)&s;
 	}
 
-	bool operator<(const ScoreSortable& other) const { return *(double*)&score < *(double*)&other.score; };
-	bool operator>(const ScoreSortable& other) const { return *(double*)&score > *(double*)&other.score; };
+	bool operator<(const ScoreSortable& other) const { return score < other.score; };
+	bool operator>(const ScoreSortable& other) const { return score > other.score; };
 };
