@@ -10,10 +10,6 @@
 Board board;
 
 
-int count = 0;
-void cbFn(const Board& board, const Move& move) {
-	++count;
-}
 
 int __cdecl main(int argc, char** argv)
 {
@@ -51,7 +47,7 @@ int __cdecl main(int argc, char** argv)
 				return 0;
 			}
 
-			//board.print();
+			board.print();
 
 			const auto move = findBestMove(board, timeBudget);
 			if (move.size() == 0)
@@ -63,8 +59,8 @@ int __cdecl main(int argc, char** argv)
 			conn.sendMove(move);
 			++moves;
 
-			//std::cout << "score: " << score << std::endl;
-			//std::cout << "===================================================" << std::endl;
+			std::cout << "score: " << score << std::endl;
+			std::cout << "===================================================" << std::endl;
 
 			//return 0;
 		}
@@ -72,6 +68,6 @@ int __cdecl main(int argc, char** argv)
 
 		conn.close();
 
-		//return 0;
+		return 0;
 	}
 }

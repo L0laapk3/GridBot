@@ -11,7 +11,7 @@ class Conn {
 public:
 	Conn(const std::string name);
 	void receiveBoard(Board& board);
-	void sendMove(const std::vector<int> move);
+	void sendMove(const std::vector<unsigned long> move);
 	void close();
 
 private:

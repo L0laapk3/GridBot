@@ -106,5 +106,5 @@ constexpr Data maskedCompareToMask(Data const& a, Data const& b, Data const& mas
 	return toMask(maskedCompare(a, b, mask));
 }
 
-const Data expand(const Move& move, const unsigned int& valueInt = 0b11111);
+const Data expand(const unsigned long& move, const unsigned int& valueInt = 0b11111);
 const uint64_t shrink(const Data& data);

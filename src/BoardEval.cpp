@@ -5,7 +5,7 @@
 
 
 
-constexpr std::array<float, 13> WEIGHTS{ 0, 0, 0, 0,0,0,0,0, 0, 0, 1, 4, 16 };
+constexpr std::array<float, 13> WEIGHTS{ 0, 0, 3, 2, 0, 0, 0, 4, 1, 2, 3, 4, 8 };
 constexpr std::array<float, 25> ALTMAP1{ 4, 3, 2, 1, 0, 9, 8, 7, 6, 5, 14, 13, 12, 11, 10, 19, 18, 17, 16, 15, 24, 23, 22, 21, 20 };
 constexpr std::array<float, 25> ALTMAP2{ 0, 5, 10, 15, 20, 1, 6, 11, 16, 21, 2, 7, 12, 17, 22, 3, 8, 13, 18, 23, 4, 9, 14, 19, 24 };
 constexpr std::array<float, 25> ALTMAP3{ 20, 15, 10, 5, 0, 21, 16, 11, 6, 1, 22, 17, 12, 7, 2, 23, 18, 13, 8, 3, 24, 19, 14, 9, 4 };
@@ -130,5 +130,5 @@ const float Board::eval() const {
 
 
 
-	return scoreSurvivability;// +scoreThrees;// +scoreWeighted / 8;// +4 * scoreContinuity;
+	return 1000 * scoreSurvivability + scoreWeighted + 100 * scoreThrees;// +scoreThrees;// +scoreWeighted / 8;// +4 * scoreContinuity;
 }

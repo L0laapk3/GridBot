@@ -133,7 +133,7 @@ void Conn::receiveBoard(Board& board) {
     board.set(s);
 };
 
-void Conn::sendMove(const std::vector<int> move) {
+void Conn::sendMove(const std::vector<unsigned long> move) {
     std::string s = "[" + std::to_string(move[0]);
     for (int i = 1; i < move.size(); i++) {
         s += "," + std::to_string(move[i]);

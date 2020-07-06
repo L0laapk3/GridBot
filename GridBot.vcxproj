@@ -251,7 +251,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\BoardUtil.cpp" />
-    <ClCompile Include="src\ExploreNode.cpp" />
     <ClCompile Include="src\Board.cpp" />
     <ClCompile Include="src\BoardEval.cpp" />
     <ClCompile Include="src\Explore.cpp" />
@@ -263,9 +262,8 @@
   <ItemGroup>
     <ClInclude Include="inc\BoardUtil.h" />
     <ClInclude Include="inc\Explore.h" />
-    <ClInclude Include="inc\ScoreSortable.h" />
+    <ClInclude Include="inc\Game.h" />
     <ClInclude Include="lib\bitset2\bitset2.hpp" />
-    <ClInclude Include="inc\ExploreNode.h" />
     <ClInclude Include="inc\Board.h" />
     <ClInclude Include="inc\Conn.h" />
     <ClInclude Include="inc\MovesTree.h" />
