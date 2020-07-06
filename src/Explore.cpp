@@ -43,8 +43,9 @@ std::vector<int> findBestMove(const Board& board) {
 	std::queue<std::span<ExploreNode>> queue;
 	queue.push(std::span<ExploreNode>(topLevelMoves));
 
-	std::cout << "depth 1 : size " << topLevelMoves.size() << std::endl;
+	std::cout << "depth 1: ratio " << topLevelMoves.size() << std::endl;
 	size_t depth = 1;
+	size_t lastSize = topLevelMoves.size();
 
 	while (std::chrono::steady_clock::now() - beginTime < std::chrono::milliseconds{MS_PER_ACTION}) {
 		size_t size = 0;
@@ -58,7 +59,8 @@ std::vector<int> findBestMove(const Board& board) {
 			queue.pop();
 		}
 
-		std::cout << "depth " << ++depth << " : size " << size << std::endl;
+		std::cout << "depth " << ++depth << ": ratio " << (int)((float)size / lastSize) << " (size " << size << ")" << std::endl;
+		lastSize = size;
 		if (size == 0) {
 			std::cout << "out of options, terminated search early" << std::endl;
 			break;
