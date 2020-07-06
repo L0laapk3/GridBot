@@ -23,7 +23,19 @@ std::vector<int> findBestMove(const Board& board) {
 
 	std::vector<ExploreNode> topLevelMoves{};
 	board.iterateMoves(topLevelMoves);
-	// no more modifications to topLevelMoves after this point
+	// no more modifications to topLevelMoves after this point (pointers matter)
+
+	if (1) {
+		std::sort(topLevelMoves.begin(), topLevelMoves.end(), std::greater<ExploreNode>());
+
+		for (auto& node : topLevelMoves) {
+			std::cout << "score " << node.getScore() << "\t";
+			const auto& move = board.decompressMove(node.score);
+			std::copy(move.begin(), move.end(), std::ostream_iterator<int>(std::cout, " "));
+			std::cout << std::endl;
+		}
+	}
+
 
 
 	for (auto& node : topLevelMoves) {
@@ -76,10 +88,19 @@ std::vector<int> findBestMove(const Board& board) {
 	for (auto& node : topLevelMoves)
 		node.computeScore();
 
+	if (1) {
+		std::sort(topLevelMoves.begin(), topLevelMoves.end(), std::greater<ExploreNode>());
+
+		for (auto& node : topLevelMoves) {
+			std::cout << node.info.board.data[127] << " score " << node.getScore() << "\t";
+			const auto& move = board.decompressMove(node.score);
+			std::copy(move.begin(), move.end(), std::ostream_iterator<int>(std::cout, " "));
+			std::cout << std::endl;
+		}
+	}
+
 	const auto& bestCandidate = std::max_element(topLevelMoves.begin(), topLevelMoves.end());
 
-	for (auto& node : topLevelMoves)
-		//std::cout << "score " << node.getScore() << std::endl;
 
 	assert(lastScore != 0 || bestCandidate->getScore() == 0);
 	lastScore = bestCandidate->getScore();
@@ -87,5 +108,5 @@ std::vector<int> findBestMove(const Board& board) {
 	std::cout << "move rating: " << bestCandidate->getScore() << std::endl;
 	//std::cout << "candidates size: " << candidates.size() << std::endl;
 	
-	return board.decompressMove(bestCandidate->score & 0xffffffff);
+	return board.decompressMove(bestCandidate->score);
 }
