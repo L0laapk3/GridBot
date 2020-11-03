@@ -19,7 +19,7 @@ int __cdecl main(int argc, char** argv)
 
 		unsigned long score = 0;
 		unsigned long moves = 0;
-		long timeBudget = 10000;
+		long timeBudget = 100;
 		while (true) {
 			conn.receiveBoard(board);
 
@@ -47,7 +47,7 @@ int __cdecl main(int argc, char** argv)
 				return 0;
 			}
 
-			board.print();
+			//board.print();
 
 			const auto move = findBestMove(board, timeBudget);
 			if (move.size() == 0)
@@ -59,15 +59,16 @@ int __cdecl main(int argc, char** argv)
 			conn.sendMove(move);
 			++moves;
 
-			std::cout << "score: " << score << std::endl;
-			std::cout << "===================================================" << std::endl;
+			//std::cout << "score: " << score << std::endl;
+			//std::cout << "===================================================" << std::endl;
+			std::cout << ".";
 
 			//return 0;
 		}
-		std::cout << "score: " << score << " in " << moves << " moves, " << (float)(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - beginTime).count() / 100)/10 << " seconds" << std::endl;
+		std::cout << std::endl <<  "score: " << score << " in " << moves << " moves, " << (float)(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - beginTime).count() / 100) / 10 << " seconds" << std::endl;
 
 		conn.close();
 
-		return 0;
+		//return 0;
 	}
 }

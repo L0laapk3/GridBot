@@ -8,7 +8,32 @@
 #include <cassert>
 
 
+<<<<<<< Updated upstream
 
+=======
+constexpr auto TIME_PER_ACTION = std::chrono::milliseconds(1000);
+
+
+unsigned long findBestMove(const Board& board) {
+	
+	// possibly better to save score locally instead of pointer to it
+	std::vector<Candidate> candidates{};
+	uint64_t lowestBest = UINT64_MAX;
+	uint64_t highestTrimmed = 0;
+
+	auto sortBest = [&]() {
+		for (const auto& candidate : candidates)
+			assert(candidate.node->info.board.data[127] == 0);
+
+		for (int i = 0; i < candidates.size(); i++)
+			for (int j = i + 1; j < candidates.size(); j++)
+				assert(candidates[i].node != candidates[j].node);
+
+
+		const auto it = std::max_element(candidates.begin(), candidates.end(), [](const Candidate& a, const Candidate& b) { return a.score < b.score; });
+		const Candidate best = *it;
+		candidates.erase(it);
+>>>>>>> Stashed changes
 
 
 
@@ -124,7 +149,7 @@ std::vector<unsigned long> findBestMove(const Board& board, long timeBudget) {
 			//std::cout << "out of options, terminated search early" << std::endl;
 			break;
 		}
-		//std::cout << "depth " << ++depth << ": ratio " << (float)(int)(ratio*10)/10 << " in " << ms << "ms. (explored " << count << ")" << std::endl;
+		std::cout << "depth " << ++depth << ": ratio " << (float)(int)(ratio*10)/10 << " in " << ms << "ms. (explored " << count << ")" << std::endl;
 		lastCount = count;
 		timeBudget -= ms * ratio;
 		if (timeBudget < 0)
