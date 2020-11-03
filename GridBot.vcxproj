@@ -147,14 +147,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Board.cpp" />
     <ClCompile Include="inc\LocalGameServer.h" />
     <ClCompile Include="inc\Random.h" />
+    <ClCompile Include="src\BoardEval.cpp" />
     <ClCompile Include="src\Conn.cpp" />
     <ClCompile Include="src\GridBot.cpp" />
     <ClCompile Include="src\LocalGameServer.cpp" />
     <ClCompile Include="src\RemoteGameServer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="inc\Board.h" />
     <ClInclude Include="inc\Conn.h" />
     <ClInclude Include="inc\IGameServer.h" />
     <ClInclude Include="inc\RemoteGameServer.h" />

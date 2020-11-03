@@ -3,9 +3,11 @@
 #include <array>
 #include <vector>
 
+#include "Board.h"
+
 class IGameServer {
 public:
-	std::array<unsigned long, 25> data;
+	Board board;
 
 	virtual void move(std::vector<unsigned long>& move) = 0;
 };

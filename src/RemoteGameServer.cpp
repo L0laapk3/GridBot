@@ -1,12 +1,12 @@
 #include "RemoteGameServer.h"
 
 RemoteGameServer::RemoteGameServer() {
-	conn.receiveBoard(data);
+	conn.receive(board);
 }
 
 void RemoteGameServer::move(std::vector<unsigned long>& move) {
 	conn.sendMove(move);
-	conn.receiveBoard(data);
+	conn.receive(board);
 }
 
 RemoteGameServer::~RemoteGameServer() {

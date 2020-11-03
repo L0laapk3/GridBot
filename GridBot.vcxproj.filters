@@ -33,6 +33,12 @@
     <ClCompile Include="inc\Random.h">
       <Filter>Header Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\BoardEval.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Board.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="inc\Conn.h">
@@ -42,6 +48,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="inc\RemoteGameServer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\Board.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

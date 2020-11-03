@@ -10,10 +10,12 @@
 #include <array>
 #include <vector>
 
+#include "Board.h"
+
 class Conn {
 public:
 	Conn();
-	void receiveBoard(std::array<unsigned long, 25>& result);
+	void receive(Board& board);
 	void sendMove(const std::vector<unsigned long> move);
 	~Conn();
 

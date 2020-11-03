@@ -107,7 +107,7 @@ Conn::~Conn() {
 }
 
 
-void Conn::receiveBoard(std::array<unsigned long, 25>& result) {
+void Conn::receive(Board& board) {
 
     char recvbuf[DEFAULT_BUFLEN];
     int recvbuflen = DEFAULT_BUFLEN;
@@ -131,6 +131,8 @@ void Conn::receiveBoard(std::array<unsigned long, 25>& result) {
     }
     //std::cout << s << std::endl;
 
+    std::array<unsigned long, 25> result;
+
     int i = 0;
     int j = 1;
     uint64_t value = 0;
@@ -144,6 +146,8 @@ void Conn::receiveBoard(std::array<unsigned long, 25>& result) {
         }
         ++j;
     }
+
+    board.set(result);
 };
 
 

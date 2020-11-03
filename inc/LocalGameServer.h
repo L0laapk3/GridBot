@@ -11,4 +11,6 @@ public:
 
 private:
 	Random m_random;
+
+	std::array<unsigned long, 25> data;
 };
