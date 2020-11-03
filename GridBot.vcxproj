@@ -151,6 +151,8 @@
     <ClCompile Include="inc\LocalGameServer.h" />
     <ClCompile Include="inc\Random.h" />
     <ClCompile Include="src\BoardEval.cpp" />
+    <ClCompile Include="src\BoardIterate.cpp" />
+    <ClCompile Include="src\BoardSearch.cpp" />
     <ClCompile Include="src\Conn.cpp" />
     <ClCompile Include="src\GridBot.cpp" />
     <ClCompile Include="src\LocalGameServer.cpp" />

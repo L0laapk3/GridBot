@@ -9,7 +9,7 @@ constexpr float MERGES_WEIGHT = 100.f;
 constexpr float MONOTONICITY_POWER = 4.f;
 constexpr float MONOTONICITY_WEIGHT = -1.f;
 
-float Board::eval() {
+float Board::eval() const {
 	float scoreMerges = 0;
 	float scoreMonotonicity = 0;
 	for (size_t m = 0; m <= 4; m += 4)
