@@ -161,7 +161,7 @@
   <ItemGroup>
     <ClInclude Include="inc\Board.h" />
     <ClInclude Include="inc\Conn.h" />
-    <ClInclude Include="inc\IGameServer.h" />
+    <ClInclude Include="inc\GameServer.h" />
     <ClInclude Include="inc\RemoteGameServer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

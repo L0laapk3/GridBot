@@ -50,13 +50,13 @@
     <ClInclude Include="inc\Conn.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="inc\IGameServer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="inc\RemoteGameServer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="inc\Board.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\GameServer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

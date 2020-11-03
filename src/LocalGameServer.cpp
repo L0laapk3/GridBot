@@ -2,7 +2,7 @@
 
 #include <cassert>
 
-static uint64_t seed = 1;
+static uint64_t seed = 0;
 LocalGameServer::LocalGameServer() : m_random(seed++) {
 	for (int i = 0; i < 25; i++)
 		data[i] = m_random.next() % 3 + 1;
@@ -28,4 +28,4 @@ void LocalGameServer::move(std::vector<unsigned long>& move) {
 	data[move[move.size() - 1]] = value * move.size();
 
 	board.set(data);
-}
+} 

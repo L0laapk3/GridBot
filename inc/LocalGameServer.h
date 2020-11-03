@@ -1,10 +1,10 @@
 #pragma once
 
-#include "IGameServer.h"
+#include "GameServer.h"
 #include "Random.h"
 
 
-class LocalGameServer : public IGameServer {
+class LocalGameServer : public GameServer {
 public:
 	LocalGameServer();
 	void move(std::vector<unsigned long>& move);

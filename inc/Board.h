@@ -1,20 +1,24 @@
 #pragma once
 
 #include <array>
+#include <stack>
 #include <functional>
 
 typedef unsigned long Value;
+typedef unsigned long CompactMove;
 typedef std::vector<Value> Move;
 typedef std::array<Value, 25> Data;
 
 class Board;
-typedef std::function<void(const Board&, const Move&, const Value)> MoveFunc;
+typedef std::function<void(const Board& board, const CompactMove move, const Value endPos, const Value value)> MoveFunc;
 
 class Board {
 public:
 	//board.cpp
 	void set(Data& value);
+	Value get(const Value cell);
 	void print() const;
+	Move decompressMove(CompactMove move, const Value endPos) const;
 
 	//boardEval.cpp
 	float eval() const;

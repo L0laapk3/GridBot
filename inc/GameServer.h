@@ -5,9 +5,8 @@
 
 #include "Board.h"
 
-class IGameServer {
+class GameServer {
 public:
 	Board board;
-
 	virtual void move(std::vector<unsigned long>& move) = 0;
 };

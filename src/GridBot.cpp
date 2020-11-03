@@ -5,7 +5,23 @@
 
 
 int main() {
-	auto server = LocalGameServer();
-	server.board.print();
-	std::cout << server.board.eval();
+	while (true) {
+		LocalGameServer server;
+		server.board.print();
+		unsigned long score = 0;
+		while (true) {
+			auto move = server.board.depthFirstSearch(2);
+			//for (auto c : move)
+			//	std::cout << c << " ";
+			if (move.size() == 0)
+				break;
+			score += move.size() * server.board.get(move[0]);
+			//std::cout << std::endl << score << std::endl;
+			server.move(move);
+			//server.board.print();
+		}
+		std::cout << std::endl;
+		server.board.print();
+		std::cout << "FINAL SCORE: " << score << std::endl;
+	}
 }

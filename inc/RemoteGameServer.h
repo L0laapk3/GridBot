@@ -1,9 +1,9 @@
 #pragma once
 
-#include "IGameServer.h"
+#include "GameServer.h"
 #include "Conn.h"
 
-class RemoteGameServer : public IGameServer {
+class RemoteGameServer : public GameServer {
 public:
 	RemoteGameServer();
 	void move(std::vector<unsigned long>& move);
