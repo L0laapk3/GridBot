@@ -1,6 +1,7 @@
 #include "Board.h"
 #include <iostream>
 
+#include <chrono>
 
 
 float Board::computeScore(unsigned long remainingDepth) const {
@@ -82,5 +83,18 @@ Move Board::depthFirstSearch(unsigned long depth) const {
 
 
 Move Board::findBestMove(unsigned long timeBudget) const {
-	return depthFirstSearch(2);
+	unsigned long depth = 0;
+	auto lastTime = 1ULL;
+	auto predictedTime = 1ULL;
+	Move result;
+	const auto beginTime = std::chrono::steady_clock::now();
+	while (predictedTime < timeBudget * 1000 && depth < 100) {
+		result = depthFirstSearch(++depth);
+		const auto time = std::max(1ULL, (unsigned long long)std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - beginTime).count());
+		predictedTime = time * time / lastTime;
+		lastTime = time;
+	}
+	//std::cout << lastTime / 1000 << "ms for depth " << depth << std::endl;
+	
+	return result;
 }

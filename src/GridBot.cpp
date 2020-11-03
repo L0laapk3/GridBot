@@ -7,10 +7,10 @@
 int main() {
 	while (true) {
 		LocalGameServer server;
-		server.board.print();
+		//server.board.print();
 		unsigned long score = 0;
 		while (true) {
-			auto move = server.board.depthFirstSearch(2);
+			auto move = server.board.findBestMove(100);
 			//for (auto c : move)
 			//	std::cout << c << " ";
 			if (move.size() == 0)

@@ -2,15 +2,17 @@
 
 #include <algorithm>
 #include <cmath>
+#include <bitset>
+#include <limits>
 
 #include <iostream>
 
 constexpr float SCORES_MERGES_WEIGHT = 100.f;
-constexpr float SCORES_MONOTONICITY_POWER = 4.f;
-constexpr float SCORES_MONOTONICITY_WEIGHT = -1.f;
-constexpr float SCORES_VALUES_WEIGHT = -20000.f;
-constexpr float SCORES_MULTIPLE_9_PENALTY = 100.f;
-constexpr float SCORES_MULTIPLE_3_POWER = 1.f;
+constexpr float SCORES_MONOTONICITY_POWER = 3.5f;
+constexpr float SCORES_MONOTONICITY_WEIGHT = 1.5f;
+constexpr float SCORES_VALUES_WEIGHT = 800000.f;
+constexpr float SCORES_NOT_MULTIPLE_2_PENALTY = std::numeric_limits<float>::max();
+constexpr float SCORES_MULTIPLE_3_POWER = 1.5f;
 
 float Board::eval() const {
 	float scoreMerges = 0;
@@ -29,11 +31,14 @@ float Board::eval() const {
 					for (auto b = bCell; b < (bCell ? bCell + 1 : 3); b++) {
 						if (a == b)
 							scoreMerges += mult;
-
-						if (a > b)
-							monotonicityLeft += mult * (std::powf(a, SCORES_MONOTONICITY_POWER) - std::powf(b, SCORES_MONOTONICITY_POWER));
-						else
-							monotonicityRight += mult * (std::powf(b, SCORES_MONOTONICITY_POWER) - std::powf(a, SCORES_MONOTONICITY_POWER));
+						else {
+							const auto aPow2 = a % 3 ? a / 3 : a;
+							const auto bPow2 = b % 3 ? b / 3 : b;
+							if (aPow2 > bPow2)
+								monotonicityLeft += mult * (std::powf(aPow2, SCORES_MONOTONICITY_POWER) - std::powf(bPow2, SCORES_MONOTONICITY_POWER));
+							else
+								monotonicityRight += mult * (std::powf(bPow2, SCORES_MONOTONICITY_POWER) - std::powf(aPow2, SCORES_MONOTONICITY_POWER));
+						}
 					}
 			}
 			scoreMonotonicity += std::min(monotonicityLeft, monotonicityRight);
@@ -43,17 +48,18 @@ float Board::eval() const {
 	for (size_t i = 0; i < 25; i++) {
 		const float mult = data[i] ? 1 : 3;
 		for (auto value = data[i]; value < (data[i] ? data[i] + 1 : 3); value++) {
-			if (data[i] % 9 == 0)
-				scoreValues += mult * SCORES_MULTIPLE_9_PENALTY;
-			else if (data[i] % 3 != 0) {
+
+			const auto n = data[i] % 3 ? data[i] : data[i] / 3;
+			if ((n & (n - 1)) != 0) // is not 2^n or 3*2^n
+				scoreValues += mult * SCORES_NOT_MULTIPLE_2_PENALTY;
+			else if (data[i] % 3 != 0)
 				scoreValues += mult * std::powf(data[i], SCORES_MULTIPLE_3_POWER);
-			}
 		}
 	}
 
 	scoreMerges *= SCORES_MERGES_WEIGHT;
-	scoreMonotonicity *= SCORES_MONOTONICITY_WEIGHT;
-	scoreValues *= SCORES_VALUES_WEIGHT;
+	scoreMonotonicity *= -SCORES_MONOTONICITY_WEIGHT;
+	scoreValues *= -SCORES_VALUES_WEIGHT;
 
 	//std::cout << scoreMerges << " " << scoreMonotonicity << " " << scoreValues << std::endl;
 	return scoreMerges + scoreMonotonicity + scoreValues;
