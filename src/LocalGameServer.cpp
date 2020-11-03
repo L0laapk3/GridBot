@@ -2,7 +2,8 @@
 
 #include <cassert>
 
-LocalGameServer::LocalGameServer() {
+static uint64_t seed = 1;
+LocalGameServer::LocalGameServer() : m_random(seed++) {
 	for (int i = 0; i < 25; i++)
 		data[i] = m_random.next() % 3 + 1;
 }
