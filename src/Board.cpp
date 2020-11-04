@@ -4,6 +4,7 @@
 #include <iostream>
 #include <bitset>
 
+
 void Board::set(Data& value) {
 	data = value;
 }

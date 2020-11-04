@@ -1,9 +1,10 @@
 #include "LocalGameServer.h"
 
 #include <cassert>
+#include <time.h>
 
 static uint64_t seed = 0;
-LocalGameServer::LocalGameServer() : m_random(seed++) {
+LocalGameServer::LocalGameServer() : m_random(time(NULL)) {
 	for (int i = 0; i < 25; i++)
 		data[i] = m_random.next() % 3 + 1;
 	

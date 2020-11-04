@@ -4,6 +4,7 @@
 #include <stack>
 #include <functional>
 
+
 typedef unsigned long Value;
 typedef unsigned long CompactMove;
 typedef std::vector<Value> Move;

@@ -7,12 +7,20 @@
 
 #include <iostream>
 
-constexpr float SCORES_MERGES_WEIGHT = 100.f;
-constexpr float SCORES_MONOTONICITY_POWER = 3.5f;
-constexpr float SCORES_MONOTONICITY_WEIGHT = 1.5f;
-constexpr float SCORES_VALUES_WEIGHT = 800000.f;
-constexpr float SCORES_NOT_MULTIPLE_2_PENALTY = std::numeric_limits<float>::max();
-constexpr float SCORES_MULTIPLE_3_POWER = 1.5f;
+static float SCORES_MERGES_WEIGHT = 100.f;
+static float SCORES_MONOTONICITY_POWER = 3.5f;
+static float SCORES_MONOTONICITY_WEIGHT = 1.5f;
+static float SCORES_VALUES_WEIGHT = 1000000.f;
+static float SCORES_NOT_MULTIPLE_2_PENALTY = std::numeric_limits<float>::max();
+static float SCORES_MULTIPLE_3_POWER = 1.5f;
+
+void setWeights(char* argv[]) {
+	SCORES_MERGES_WEIGHT = atof(argv[1]);
+	SCORES_MONOTONICITY_POWER = atof(argv[2]);
+	SCORES_MONOTONICITY_WEIGHT = atof(argv[3]);
+	SCORES_VALUES_WEIGHT = atof(argv[4]);
+	SCORES_MULTIPLE_3_POWER = atof(argv[5]);
+}
 
 float Board::eval() const {
 	float scoreMerges = 0;
